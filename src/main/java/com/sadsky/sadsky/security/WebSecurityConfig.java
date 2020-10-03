@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,7 +28,7 @@ import java.util.Collections;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @Setter(onMethod_ = @Autowired)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
     private UserDetailsService userDetailsService;
@@ -78,6 +80,12 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("HEAD", "GET", "PUT", "POST", "PATCH", "DELETE");
     }
 
 }
