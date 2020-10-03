@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,6 +67,7 @@ class UserFacadeTest {
         userDTO.setUserId(UUID.randomUUID());
         userDTO.setFirstName("Jan");
         userDTO.setLastName("Kowalski");
+        userDTO.setBirthDay(LocalDate.of(2000, 5, 20));
         userDTO.setEmail("Test@Test.pl");
         userDTO.setPassword("Test");
         userDTO.setGroup(new AdminGroup());
