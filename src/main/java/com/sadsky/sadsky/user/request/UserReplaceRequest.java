@@ -5,12 +5,23 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 public class UserReplaceRequest implements Serializable {
+
+    @NotBlank
+    @Size(min = 2, max = 255)
+    @Pattern(regexp = "^[a-zA-Z]+$")
+    private String firstName;
+
+    @NotBlank
+    @Size(min = 2, max = 255)
+    @Pattern(regexp = "^[a-zA-Z]+$")
+    private String lastName;
 
     @NotBlank
     @Email

@@ -41,6 +41,12 @@ public class User implements UserMiniDetailsResponse {
     private UUID userId;
 
     @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(nullable = false)
     @SortBlacklisted
     @QueryType(PropertyType.NONE)
     private String email;

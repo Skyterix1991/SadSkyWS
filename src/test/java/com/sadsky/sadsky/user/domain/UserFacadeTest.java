@@ -64,6 +64,8 @@ class UserFacadeTest {
 
         userDTO = new UserDTO();
         userDTO.setUserId(UUID.randomUUID());
+        userDTO.setFirstName("Jan");
+        userDTO.setLastName("Kowalski");
         userDTO.setEmail("Test@Test.pl");
         userDTO.setPassword("Test");
         userDTO.setGroup(new AdminGroup());

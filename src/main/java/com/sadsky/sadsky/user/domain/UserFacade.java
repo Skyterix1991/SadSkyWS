@@ -210,6 +210,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     private void createTestingUsers() {
         UserDTO adminUser = new UserDTO();
+        adminUser.setFirstName("Jan");
+        adminUser.setLastName("Kowalski");
         adminUser.setEmail("admin@admin.pl");
         adminUser.setPassword("admin");
         adminUser.setGroup(new AdminGroup());

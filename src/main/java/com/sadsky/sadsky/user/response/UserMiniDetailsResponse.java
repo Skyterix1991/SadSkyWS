@@ -12,6 +12,10 @@ import java.util.UUID;
 public interface UserMiniDetailsResponse extends Serializable {
     UUID getUserId();
 
+    String getFirstName();
+
+    String getLastName();
+
     GroupStrategy getGroup();
 
     LocalDateTime getCreateDate();

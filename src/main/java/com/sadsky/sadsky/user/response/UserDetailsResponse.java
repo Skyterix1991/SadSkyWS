@@ -15,6 +15,10 @@ public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse
 
     private UUID userId;
 
+    private String firstName;
+
+    private String lastName;
+
     private String email;
 
     private GroupStrategy group;

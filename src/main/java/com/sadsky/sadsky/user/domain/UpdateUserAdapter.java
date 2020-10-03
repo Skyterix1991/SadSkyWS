@@ -24,6 +24,14 @@ class UpdateUserAdapter implements UpdateUserPort {
         if (userRepository.existsByEmail(userDTO.getEmail()))
             throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(userDTO.getEmail()));
 
+        if (userDTO.getFirstName() != null) {
+            user.setFirstName(userDTO.getFirstName());
+        }
+
+        if (userDTO.getLastName() != null) {
+            user.setFirstName(userDTO.getFirstName());
+        }
+
         if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail());
             user.setLastTokenRevokeDate(currentTime);

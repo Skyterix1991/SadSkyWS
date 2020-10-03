@@ -15,6 +15,8 @@ public class MiniUserDTO {
 
     private UUID userId;
 
+    private String firstName;
+
     private GroupStrategy group;
 
     private LocalDateTime createDate;
