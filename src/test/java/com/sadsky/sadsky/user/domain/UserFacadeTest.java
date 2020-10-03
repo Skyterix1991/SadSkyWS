@@ -7,7 +7,6 @@ import com.sadsky.sadsky.exception.RecordNotFoundException;
 import com.sadsky.sadsky.user.domain.dto.UserDTO;
 import com.sadsky.sadsky.user.domain.group.strategy.AdminGroup;
 import com.sadsky.sadsky.util.JpaModelMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,7 +73,6 @@ class UserFacadeTest {
         mockAuthentication();
     }
 
-    @SneakyThrows
     private void mockAuthentication() {
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(UUID.randomUUID());
@@ -102,16 +100,6 @@ class UserFacadeTest {
         // Given
         // When
         when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(true);
-        // Then
-        assertThrows(RecordAlreadyExistsException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
-    }
-
-    @Test
-    @DisplayName("Create user with existing username")
-    void givenUserDTOWithExistingUsername_whenCreateUser_thenThrowRecordAlreadyExistsException() {
-        // Given
-        // When
-        when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(false);
         // Then
         assertThrows(RecordAlreadyExistsException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
@@ -170,18 +158,6 @@ class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Update user with existing username")
-    void givenNonExistingUsername_whenUpdateUser_thenThrowRecordAlreadyExistsException() {
-        // Given
-        // When
-        when(userRepository.findUserByUserId(any())).thenReturn(Optional.of(new User()));
-        when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(false);
-        // Then
-        assertThrows(RecordAlreadyExistsException.class, () -> userFacade.updateUser(UUID.randomUUID(), userDTO), "RecordAlreadyExistsException was not thrown.");
-    }
-
-
-    @Test
     @DisplayName("Replace user")
     void givenUserId_whenReplaceUser_thenRunSuccessfully() {
         // Given
@@ -210,17 +186,6 @@ class UserFacadeTest {
         // When
         when(userRepository.findUserByUserId(any())).thenReturn(Optional.of(new User()));
         when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(true);
-        // Then
-        assertThrows(RecordAlreadyExistsException.class, () -> userFacade.replaceUser(UUID.randomUUID(), userDTO), "RecordAlreadyExistsException was not thrown.");
-    }
-
-    @Test
-    @DisplayName("Replace user with existing username")
-    void givenNonExistingUsername_whenReplaceUser_thenThrowRecordAlreadyExistsException() {
-        // Given
-        // When
-        when(userRepository.findUserByUserId(any())).thenReturn(Optional.of(new User()));
-        when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(false);
         // Then
         assertThrows(RecordAlreadyExistsException.class, () -> userFacade.replaceUser(UUID.randomUUID(), userDTO), "RecordAlreadyExistsException was not thrown.");
     }
