@@ -37,6 +37,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcCo
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors()
+                .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
