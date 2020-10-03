@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,6 +19,8 @@ public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse
     private String firstName;
 
     private String lastName;
+
+    private LocalDate birthDay;
 
     private String email;
 

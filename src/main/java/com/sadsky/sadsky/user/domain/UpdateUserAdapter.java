@@ -32,6 +32,10 @@ class UpdateUserAdapter implements UpdateUserPort {
             user.setFirstName(userDTO.getFirstName());
         }
 
+        if (userDTO.getBirthDay() != null) {
+            user.setBirthDay(userDTO.getBirthDay());
+        }
+
         if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail());
             user.setLastTokenRevokeDate(currentTime);

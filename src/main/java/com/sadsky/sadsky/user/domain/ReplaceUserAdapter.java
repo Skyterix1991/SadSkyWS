@@ -26,6 +26,7 @@ class ReplaceUserAdapter implements ReplaceUserPort {
 
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
+        user.setBirthDay(userDTO.getBirthDay());
         user.setEmail(userDTO.getEmail());
         user.setLastTokenRevokeDate(currentTime);
 

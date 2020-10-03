@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,6 +17,8 @@ public class UserDTO {
     private UUID userId;
 
     private String firstName;
+
+    private LocalDate birthDay;
 
     private String lastName;
 
