@@ -8,8 +8,6 @@ public enum Permission implements Permissions {
     GET_FULL_USERS,
     GET_MINI_USERS,
 
-    CREATE_USER,
-
     DELETE_USER,
 
     UPDATE_USER,
