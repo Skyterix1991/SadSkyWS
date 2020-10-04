@@ -46,12 +46,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     @Override
     public UUID createUser(UserDTO userDTO) {
-        User currentUser = getAuthenticatedUser();
-
-        if (currentUser.hasPermission(Permission.CREATE_USER)) {
-            return createUserAdapter.createUser(userDTO);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        return createUserAdapter.createUser(userDTO);
     }
 
     /**
