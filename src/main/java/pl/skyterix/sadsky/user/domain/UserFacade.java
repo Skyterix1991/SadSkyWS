@@ -208,7 +208,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         UserDTO adminUser = new UserDTO();
         adminUser.setFirstName("Jan");
         adminUser.setLastName("Kowalski");
-        adminUser.setBirthDay(LocalDate.of(2000, 5, 20));
+        adminUser.setBirthDay(LocalDate.now().minusYears(16));
         adminUser.setEmail("admin@admin.pl");
         adminUser.setPassword("admin");
         adminUser.setGroup(new AdminGroup());
