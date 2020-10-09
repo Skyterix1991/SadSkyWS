@@ -11,8 +11,8 @@ class UpdatePredictionAdapter implements UpdatePredictionPort {
     private final PredictionRepositoryPort predictionRepository;
 
     @Override
-    public void updateUser(UUID userId, PredictionDTO predictionDTO) {
-        Prediction prediction = predictionRepository.findByPredictionId(userId);
+    public void updatePrediction(UUID predictionId, PredictionDTO predictionDTO) {
+        Prediction prediction = predictionRepository.findByPredictionId(predictionId);
 
         predictionRepository.updatePrediction(prediction);
     }
