@@ -3,6 +3,7 @@ package pl.skyterix.sadsky.user.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
@@ -24,6 +25,9 @@ public class UserUpdateRequest implements Serializable {
     private String lastName;
 
     private LocalDate birthDay;
+
+    @Range(min = 0, max = 23)
+    private Short wakeHour;
 
     @Email
     @Size(max = 255)

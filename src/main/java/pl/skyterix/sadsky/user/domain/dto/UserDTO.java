@@ -20,6 +20,8 @@ public class UserDTO {
 
     private LocalDate birthDay;
 
+    private Short wakeHour;
+
     private String lastName;
 
     private String email;

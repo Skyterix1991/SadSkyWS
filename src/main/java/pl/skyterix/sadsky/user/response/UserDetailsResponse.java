@@ -22,6 +22,8 @@ public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse
 
     private LocalDate birthDay;
 
+    private Short wakeHour;
+
     private String email;
 
     private GroupStrategy group;
