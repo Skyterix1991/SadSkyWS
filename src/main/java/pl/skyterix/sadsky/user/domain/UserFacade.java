@@ -34,7 +34,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     private final SetUserGroupPort setUserGroupAdapter;
 
     /**
-     * Creates user.
+     * Creates user based on input given in UserDTO validated before by request validators.
      *
      * @param userDTO User to create.
      * @return Created user UUID.
@@ -45,7 +45,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Deletes user.
+     * Deletes user by userId.
      *
      * @param userId User UUID.
      */
@@ -89,7 +89,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Get user with full details.
+     * Get user by userId with full details.
      *
      * @param userId User UUID.
      * @return User with given UUID.
@@ -103,7 +103,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Get user with reduced details.
+     * Get user by userId with reduced details.
      *
      * @param userId User UUID.
      * @return User with given UUID.
@@ -120,7 +120,9 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Updates user.
+     * Updates user by userId based on input given in UserDTO validated before by request validators.
+     * Update will only be performed on field if its value is different than null.
+     * User token will be revoked only if edited fields are one of the following: email, password.
      *
      * @param userId  User UUID.
      * @param userDTO Updated user.
@@ -131,7 +133,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Replaces user.
+     * Replaces user fields by userId based on input given in UserDTO validated before by request validators.
+     * All fields will be overwritten and user will be required to generate new token.
      *
      * @param userId  User UUID
      * @param userDTO Replacement user.
@@ -159,7 +162,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Assigns user group.
+     * Assigns predefined group to user by userId.
      *
      * @param userId        User UUID.
      * @param groupStrategy Group strategy.
