@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 @Transactional
-public interface PredictionRepository extends JpaRepository<Prediction, Long>, QuerydslPredicateExecutor<Prediction> {
+interface PredictionRepository extends JpaRepository<Prediction, Long>, QuerydslPredicateExecutor<Prediction> {
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
 
     boolean existsByPredictionId(UUID predictionId);

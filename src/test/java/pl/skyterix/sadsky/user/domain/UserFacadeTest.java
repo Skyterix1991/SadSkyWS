@@ -225,7 +225,7 @@ class UserFacadeTest {
         // Then
         assertEquals(
                 new PageImpl<>(Collections.singletonList(userDTO)).getSize(),
-                userFacade.getUsers(predicate, pageRequest).getSize()
+                userFacade.getFullUsers(predicate, pageRequest).getSize()
                 , "Received list length is not the same as original.");
     }
 
@@ -238,7 +238,7 @@ class UserFacadeTest {
         // Then
         userDTO.setPassword(null);
 
-        assertEquals(userDTO, userFacade.getUser(UUID.randomUUID()), "Received user is not the same as original.");
+        assertEquals(userDTO, userFacade.getFullUser(UUID.randomUUID()), "Received user is not the same as original.");
     }
 
     @Test
@@ -248,7 +248,7 @@ class UserFacadeTest {
         // When
         when(userRepository.findUserByUserId(any())).thenReturn(Optional.empty());
         // Then
-        assertThrows(RecordNotFoundException.class, () -> userFacade.getUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
+        assertThrows(RecordNotFoundException.class, () -> userFacade.getFullUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
     }
 
     @Test

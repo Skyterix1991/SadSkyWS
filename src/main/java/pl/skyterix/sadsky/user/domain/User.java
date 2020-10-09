@@ -12,7 +12,6 @@ import pl.skyterix.sadsky.user.domain.group.Permissions;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.user.domain.group.strategy.UserGroup;
-import pl.skyterix.sadsky.user.response.UserMiniDetailsResponse;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.Column;
@@ -29,7 +28,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-public class User implements UserMiniDetailsResponse {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

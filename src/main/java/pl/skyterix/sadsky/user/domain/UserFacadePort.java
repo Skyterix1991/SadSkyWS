@@ -9,9 +9,13 @@ import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import java.util.UUID;
 
 interface UserFacadePort {
-    Page<UserDTO> getUsers(Predicate predicate, Pageable pageRequest);
+    Page<UserDTO> getFullUsers(Predicate predicate, Pageable pageRequest);
 
-    UserDTO getUser(UUID userId);
+    Page<UserDTO> getMiniUsers(Predicate predicate, Pageable pageRequest);
+
+    UserDTO getFullUser(UUID userId);
+
+    UserDTO getMiniUser(UUID userId);
 
     void updateUser(UUID userId, UserDTO userDTO);
 

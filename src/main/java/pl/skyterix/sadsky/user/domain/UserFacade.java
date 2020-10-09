@@ -9,15 +9,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import pl.skyterix.sadsky.exception.Errors;
-import pl.skyterix.sadsky.exception.GroupUnauthorizedException;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.user.domain.dto.MiniUserDTO;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
-import pl.skyterix.sadsky.user.domain.group.Permission;
-import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
-import pl.skyterix.sadsky.user.response.UserMiniDetailsResponse;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import java.time.LocalDate;
@@ -31,7 +27,6 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     private final Environment environment;
     private final JpaModelMapper jpaModelMapper;
     private final UserRepository userRepository;
-    private final MiniUserRepository miniUserRepository;
     private final CreateUserPort createUserAdapter;
     private final DeleteUserPort deleteUserAdapter;
     private final UpdateUserPort updateUserAdapter;
@@ -56,42 +51,19 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     @Override
     public void deleteUser(UUID userId) {
-        User currentUser = getAuthenticatedUser();
-
-        if (currentUser.hasPermission(userId, SelfPermission.DELETE_SELF_USER, Permission.DELETE_USER)) {
-            deleteUserAdapter.deleteUser(userId);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        deleteUserAdapter.deleteUser(userId);
     }
 
     /**
-     * Get users in Page.
+     * Get users in Page with full details.
      *
      * @param predicate   Predicate to search with.
      * @param pageRequest Page info.
      * @return Paged result list.
      */
     @Override
-    public Page<UserDTO> getUsers(Predicate predicate, Pageable pageRequest) {
-        User currentUser = getAuthenticatedUser();
-
-        Page<User> users;
-
-        if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
-            users = userRepository.findAll(predicate, pageRequest);
-
-        } else if (currentUser.hasPermission(Permission.GET_MINI_USERS)) {
-            Page<UserMiniDetailsResponse> userMiniDetailsResponsePage = miniUserRepository.findAllProjectedBy(pageRequest);
-
-            Page<MiniUserDTO> miniUserDTOPage = userMiniDetailsResponsePage.stream()
-                    .map((miniUser) -> jpaModelMapper.mapEntity(miniUser, MiniUserDTO.class))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), (list) -> new PageImpl<>(list, pageRequest, userMiniDetailsResponsePage.getTotalElements())));
-
-            users = miniUserDTOPage.stream()
-                    .map((miniUser) -> jpaModelMapper.mapEntity(miniUser, User.class))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), (list) -> new PageImpl<>(list, pageRequest, miniUserDTOPage.getTotalElements())));
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+    public Page<UserDTO> getFullUsers(Predicate predicate, Pageable pageRequest) {
+        Page<User> users = userRepository.findAll(predicate, pageRequest);
 
         return users.stream()
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
@@ -99,33 +71,52 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     }
 
     /**
-     * Get user.
+     * Get users in Page with reduced details.
+     *
+     * @param predicate   Predicate to search with.
+     * @param pageRequest Page info.
+     * @return Paged result list.
+     */
+    @Override
+    public Page<UserDTO> getMiniUsers(Predicate predicate, Pageable pageRequest) {
+        Page<UserDTO> users = getFullUsers(predicate, pageRequest);
+
+        return users.stream()
+                // Map user to mini version and then back to remove sensitive data
+                .map((miniUser) -> jpaModelMapper.mapEntity(miniUser, MiniUserDTO.class))
+                .map((miniUser) -> jpaModelMapper.mapEntity(miniUser, UserDTO.class))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), (list) -> new PageImpl<>(list, pageRequest, users.getTotalElements())));
+    }
+
+    /**
+     * Get user with full details.
      *
      * @param userId User UUID.
      * @return User with given UUID.
      */
     @Override
-    public UserDTO getUser(UUID userId) {
-        User currentUser = getAuthenticatedUser();
-        User user;
-
-        if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER)) {
-
-            user = userRepository.findUserByUserId(userId)
-                    .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString())));
-
-        } else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER)) {
-
-            UserMiniDetailsResponse userMini = miniUserRepository.findUserByUserId(userId)
-                    .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString())));
-
-            MiniUserDTO miniUserDTO = jpaModelMapper.mapEntity(userMini, MiniUserDTO.class);
-
-            user = jpaModelMapper.mapEntity(miniUserDTO, User.class);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+    public UserDTO getFullUser(UUID userId) {
+        User user = userRepository.findUserByUserId(userId)
+                .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString())));
 
         return jpaModelMapper.mapEntity(user, UserDTO.class);
+    }
+
+    /**
+     * Get user with reduced details.
+     *
+     * @param userId User UUID.
+     * @return User with given UUID.
+     */
+    @Override
+    public UserDTO getMiniUser(UUID userId) {
+        UserDTO userDTO = getFullUser(userId);
+
+        // Map user to mini version and then back to full remove sensitive data
+
+        MiniUserDTO miniUserDTO = jpaModelMapper.mapEntity(userDTO, MiniUserDTO.class);
+
+        return jpaModelMapper.mapEntity(miniUserDTO, UserDTO.class);
     }
 
     /**
@@ -136,12 +127,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     @Override
     public void updateUser(UUID userId, UserDTO userDTO) {
-        User currentUser = getAuthenticatedUser();
-
-        if (currentUser.hasPermission(userId, SelfPermission.UPDATE_SELF_USER, Permission.UPDATE_USER)) {
-            updateUserAdapter.updateUser(userId, userDTO);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        updateUserAdapter.updateUser(userId, userDTO);
     }
 
     /**
@@ -152,12 +138,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     @Override
     public void replaceUser(UUID userId, UserDTO userDTO) {
-        User currentUser = getAuthenticatedUser();
-
-        if (currentUser.hasPermission(userId, SelfPermission.REPLACE_SELF_USER, Permission.REPLACE_USER)) {
-            replaceUserAdapter.replaceUser(userId, userDTO);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        replaceUserAdapter.replaceUser(userId, userDTO);
     }
 
     /**
@@ -185,12 +166,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
      */
     @Override
     public void setUserGroup(UUID userId, GroupStrategy groupStrategy) {
-        User currentUser = getAuthenticatedUser();
-
-        if (currentUser.hasPermission(Permission.ASSIGN_GROUP)) {
-            setUserGroupAdapter.setUserGroup(userId, groupStrategy);
-        } else
-            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        setUserGroupAdapter.setUserGroup(userId, groupStrategy);
     }
 
     @Override

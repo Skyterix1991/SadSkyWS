@@ -14,7 +14,6 @@ class UserConfig {
 
     private final Environment environment;
     private final UserRepository userRepository;
-    private final MiniUserRepository miniUserRepository;
     private final JpaModelMapper jpaModelMapper;
 
     @Bean
@@ -26,7 +25,6 @@ class UserConfig {
                 environment,
                 jpaModelMapper,
                 userRepository,
-                miniUserRepository,
                 new CreateUserAdapter(userRepositoryAdapter, jpaModelMapper, bCryptPasswordEncoder),
                 new DeleteUserAdapter(userRepositoryAdapter),
                 new UpdateUserAdapter(userRepositoryAdapter, bCryptPasswordEncoder),
