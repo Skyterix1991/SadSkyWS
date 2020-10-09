@@ -2,6 +2,8 @@ package pl.skyterix.sadsky.user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +14,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserReplaceRequest implements Serializable {
 
@@ -27,6 +30,10 @@ public class UserReplaceRequest implements Serializable {
 
     @NotNull
     private LocalDate birthDay;
+
+    @NotNull
+    @Range(min = 0, max = 23)
+    private Short wakeHour;
 
     @NotBlank
     @Email

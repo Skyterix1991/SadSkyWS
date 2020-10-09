@@ -45,6 +45,10 @@ class UpdateUserAdapter implements UpdateUserPort {
             user.setBirthDay(userDTO.getBirthDay());
         }
 
+        if (userDTO.getWakeHour() != null) {
+            user.setWakeHour(userDTO.getWakeHour());
+        }
+
         if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail());
             user.setLastTokenRevokeDate(currentTime);

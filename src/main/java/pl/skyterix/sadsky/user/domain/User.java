@@ -51,6 +51,9 @@ public class User implements UserMiniDetailsResponse {
     private LocalDate birthDay;
 
     @Column(nullable = false)
+    private short wakeHour;
+
+    @Column(nullable = false)
     @SortBlacklisted
     @QueryType(PropertyType.NONE)
     private String email;
@@ -81,6 +84,9 @@ public class User implements UserMiniDetailsResponse {
         this.userId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();
         this.lastTokenRevokeDate = LocalDateTime.now();
+
+        // Default wake hour is 7 in 24 h cycle.
+        this.wakeHour = 7;
     }
 
     @PreUpdate

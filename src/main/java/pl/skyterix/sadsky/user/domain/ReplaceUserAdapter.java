@@ -37,6 +37,7 @@ class ReplaceUserAdapter implements ReplaceUserPort {
         user.setLastName(userDTO.getLastName());
         user.setBirthDay(userDTO.getBirthDay());
         user.setEmail(userDTO.getEmail());
+        user.setWakeHour(userDTO.getWakeHour());
         user.setLastTokenRevokeDate(currentTime);
 
         String encryptedPassword = bCryptPasswordEncoder.encode(userDTO.getPassword());
