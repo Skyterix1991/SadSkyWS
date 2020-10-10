@@ -192,6 +192,6 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         adminUser.setPassword("admin");
         adminUser.setGroup(new AdminGroup());
 
-        createUserAdapter.createUser(adminUser);
+        createUser(adminUser);
     }
 }
