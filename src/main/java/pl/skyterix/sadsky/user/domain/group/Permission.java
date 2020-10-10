@@ -15,5 +15,9 @@ public enum Permission implements Permissions {
     REPLACE_USER,
 
     // Group permissions
-    ASSIGN_GROUP
+    ASSIGN_GROUP,
+
+    // Prediction permissions
+    GET_USER_PREDICTIONS,
+    GET_USER_PREDICTION
 }

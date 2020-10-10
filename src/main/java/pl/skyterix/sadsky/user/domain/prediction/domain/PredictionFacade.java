@@ -1,23 +1,19 @@
 package pl.skyterix.sadsky.user.domain.prediction.domain;
 
-import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
-import pl.skyterix.sadsky.user.domain.UserFacade;
+import pl.skyterix.sadsky.user.domain.prediction.domain.dto.MiniUserPredictionDTO;
 import pl.skyterix.sadsky.user.domain.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PredictionFacade implements PredictionFacadePort {
 
-    private final UserFacade userFacade;
     private final JpaModelMapper jpaModelMapper;
     private final PredictionRepository predictionRepository;
     private final CreatePredictionPort createPredictionAdapter;
@@ -36,20 +32,42 @@ public class PredictionFacade implements PredictionFacadePort {
     }
 
     @Override
-    public Page<PredictionDTO> getPredictions(Predicate predicate, Pageable pageRequest) {
-        Page<Prediction> predictions = predictionRepository.findAll(predicate, pageRequest);
+    public Set<PredictionDTO> getFullUserPredictions(UUID userId) {
+        Set<Prediction> predictions = predictionRepository.findAllByUserId(userId);
 
         return predictions.stream()
                 .map((prediction) -> jpaModelMapper.mapEntity(prediction, PredictionDTO.class))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), (list) -> new PageImpl<>(list, pageRequest, predictions.getTotalElements())));
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public PredictionDTO getPrediction(UUID predictionId) {
-        Prediction prediction = predictionRepository.findPredictionByPredictionId(predictionId)
+    public Set<PredictionDTO> getMiniUserPredictions(UUID userId) {
+        Set<PredictionDTO> predictions = getFullUserPredictions(userId);
+
+        return predictions.stream()
+                .map((prediction) -> jpaModelMapper.mapEntity(prediction, MiniUserPredictionDTO.class))
+                .map((prediction) -> jpaModelMapper.mapEntity(prediction, PredictionDTO.class))
+                .collect(Collectors.toSet());
+    }
+
+
+    @Override
+    public PredictionDTO getFullUserPrediction(UUID userId, UUID predictionId) {
+        Prediction prediction = predictionRepository.findPredictionByUserIdAndPredictionId(userId, predictionId)
                 .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(predictionId.toString())));
 
         return jpaModelMapper.mapEntity(prediction, PredictionDTO.class);
+    }
+
+    @Override
+    public PredictionDTO getMiniUserPrediction(UUID userId, UUID predictionId) {
+        PredictionDTO predictionDTO = getFullUserPrediction(userId, predictionId);
+
+        // Map prediction to mini version and then back to full remove sensitive data
+
+        MiniUserPredictionDTO miniUserPredictionDTO = jpaModelMapper.mapEntity(predictionDTO, MiniUserPredictionDTO.class);
+
+        return jpaModelMapper.mapEntity(miniUserPredictionDTO, PredictionDTO.class);
     }
 
     @Override

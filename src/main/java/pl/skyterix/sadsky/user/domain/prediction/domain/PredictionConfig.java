@@ -20,7 +20,6 @@ class PredictionConfig {
         PredictionRepositoryPort predictionRepositoryAdapter = new PredictionRepositoryAdapter(predictionRepository);
 
         return new PredictionFacade(
-                userFacade,
                 jpaModelMapper,
                 predictionRepository,
                 new CreatePredictionAdapter(predictionRepositoryAdapter, jpaModelMapper),

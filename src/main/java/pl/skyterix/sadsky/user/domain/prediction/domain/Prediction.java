@@ -7,13 +7,16 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
+import pl.skyterix.sadsky.user.domain.User;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
@@ -33,6 +36,12 @@ public class Prediction {
     @NaturalId
     @Column(nullable = false, updatable = false)
     private UUID predictionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @QueryType(PropertyType.NONE)
+    private User owner;
 
     @Column(updatable = false)
     private LocalDateTime createDate;

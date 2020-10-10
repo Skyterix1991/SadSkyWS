@@ -1,16 +1,18 @@
 package pl.skyterix.sadsky.user.domain.prediction.domain;
 
-import com.querydsl.core.types.Predicate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import pl.skyterix.sadsky.user.domain.prediction.domain.dto.PredictionDTO;
 
+import java.util.Set;
 import java.util.UUID;
 
 interface PredictionFacadePort {
-    Page<PredictionDTO> getPredictions(Predicate predicate, Pageable pageRequest);
+    Set<PredictionDTO> getFullUserPredictions(UUID userId);
 
-    PredictionDTO getPrediction(UUID predictionId);
+    Set<PredictionDTO> getMiniUserPredictions(UUID userId);
+
+    PredictionDTO getFullUserPrediction(UUID userId, UUID predictionId);
+
+    PredictionDTO getMiniUserPrediction(UUID userId, UUID predictionId);
 
     void updatePrediction(UUID predictionId, PredictionDTO predictionDTO);
 
