@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.GroupUnauthorizedException;
+import pl.skyterix.sadsky.user.QueryUserController;
 import pl.skyterix.sadsky.user.domain.User;
 import pl.skyterix.sadsky.user.domain.UserFacade;
 import pl.skyterix.sadsky.user.domain.group.Permission;
@@ -91,6 +92,8 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
     private PredictionDetailsResponse addPredictionRelations(PredictionDetailsResponse predictionDetailsResponse) {
         predictionDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getPrediction(predictionDetailsResponse.getOwner().getUserId(), predictionDetailsResponse.getPredictionId())).withSelfRel());
         predictionDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getUserPredictions(predictionDetailsResponse.getOwner().getUserId())).withRel("userPredictions"));
+        predictionDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUser(predictionDetailsResponse.getOwner().getUserId())).withRel("user"));
+        predictionDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUsers(null, null, null, null, null)).withRel("users"));
 
         return predictionDetailsResponse;
     }

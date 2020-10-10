@@ -24,6 +24,7 @@ import pl.skyterix.sadsky.user.domain.UserFacade;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.user.domain.group.Permission;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
+import pl.skyterix.sadsky.user.domain.prediction.QueryPredictionController;
 import pl.skyterix.sadsky.user.response.UserDetailsResponse;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 import pl.skyterix.sadsky.util.SortBlacklistUtil;
@@ -106,6 +107,8 @@ public class QueryUserController implements QueryUserControllerPort {
     private UserDetailsResponse addUserRelations(UserDetailsResponse userDetailsResponse) {
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUser(userDetailsResponse.getUserId())).withSelfRel());
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUsers(null, null, null, null, null)).withRel("users"));
+        userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getUserPredictions(userDetailsResponse.getUserId())).withRel("userPredictions"));
+        userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getPrediction(userDetailsResponse.getUserId(), null)).withRel("userPrediction"));
 
         return userDetailsResponse;
     }
