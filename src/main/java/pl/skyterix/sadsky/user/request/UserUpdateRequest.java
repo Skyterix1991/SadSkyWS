@@ -1,6 +1,5 @@
 package pl.skyterix.sadsky.user.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserUpdateRequest implements Serializable {
 
     @Size(min = 2, max = 255)

@@ -12,24 +12,27 @@ import pl.skyterix.sadsky.user.domain.group.Permissions;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.user.domain.group.strategy.UserGroup;
-import pl.skyterix.sadsky.user.response.UserMiniDetailsResponse;
+import pl.skyterix.sadsky.user.domain.prediction.domain.Prediction;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class User implements UserMiniDetailsResponse {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -46,6 +49,11 @@ public class User implements UserMiniDetailsResponse {
 
     @Column(nullable = false)
     private String lastName;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Prediction> predictions;
 
     @Column(nullable = false)
     private LocalDate birthDay;

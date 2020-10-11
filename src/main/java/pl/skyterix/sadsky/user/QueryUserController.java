@@ -17,10 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.skyterix.sadsky.exception.BlacklistedSortException;
 import pl.skyterix.sadsky.exception.Errors;
+import pl.skyterix.sadsky.exception.GroupUnauthorizedException;
 import pl.skyterix.sadsky.pageable.PageableRequest;
 import pl.skyterix.sadsky.user.domain.User;
 import pl.skyterix.sadsky.user.domain.UserFacade;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
+import pl.skyterix.sadsky.user.domain.group.Permission;
+import pl.skyterix.sadsky.user.domain.group.SelfPermission;
+import pl.skyterix.sadsky.user.domain.prediction.QueryPredictionController;
 import pl.skyterix.sadsky.user.response.UserDetailsResponse;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 import pl.skyterix.sadsky.util.SortBlacklistUtil;
@@ -48,6 +52,7 @@ public class QueryUserController implements QueryUserControllerPort {
                                                                  @RequestParam(required = false) String sort,
                                                                  @RequestParam(required = false) Integer size,
                                                                  @RequestParam(required = false) Integer page) {
+        // Build page from page informations
         Pageable pageable = PageableRequest.builder()
                 .order(order)
                 .sort(sort)
@@ -55,11 +60,23 @@ public class QueryUserController implements QueryUserControllerPort {
                 .page(page)
                 .build().toPageable();
 
+        // Make sure predicate is does not contain blocked fields
         if (sortBlacklistUtil.getBlackListedFields(User.class).contains(pageable.getSort().toString().strip()))
             throw new BlacklistedSortException(Errors.SORT_NOT_ALLOWED_ON_FIELD.getErrorMessage(pageable.getSort().toString()));
 
-        Page<UserDTO> users = userFacade.getUsers(predicate, pageable);
+        User currentUser = userFacade.getAuthenticatedUser();
 
+        Page<UserDTO> users;
+
+        // Check if currentUser has permissions to get full users or reduced users
+        if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+            users = userFacade.getFullUsers(predicate, pageable);
+        else if (currentUser.hasPermission(Permission.GET_MINI_USERS))
+            users = userFacade.getMiniUsers(predicate, pageable);
+        else
+            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+
+        // Map to response and add hateoas
         Page<UserDetailsResponse> userDetailsResponses = users.stream()
                 .map((userDTO) -> jpaModelMapper.mapEntity(userDTO, UserDetailsResponse.class))
                 .map(this::addUserRelations)
@@ -71,14 +88,27 @@ public class QueryUserController implements QueryUserControllerPort {
     @Override
     @GetMapping("/{userId}")
     public UserDetailsResponse getUser(@PathVariable UUID userId) {
-        UserDTO userDTO = userFacade.getUser(userId);
+        User currentUser = userFacade.getAuthenticatedUser();
 
+        UserDTO userDTO;
+
+        // Check if currentUser has permissions to get full user or reduced user
+        if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER))
+            userDTO = userFacade.getFullUser(userId);
+        else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER))
+            userDTO = userFacade.getMiniUser(userId);
+        else
+            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+
+        // Add hateoas and map to response
         return addUserRelations(jpaModelMapper.mapEntity(userDTO, UserDetailsResponse.class));
     }
 
     private UserDetailsResponse addUserRelations(UserDetailsResponse userDetailsResponse) {
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUser(userDetailsResponse.getUserId())).withSelfRel());
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUsers(null, null, null, null, null)).withRel("users"));
+        userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getUserPredictions(userDetailsResponse.getUserId())).withRel("userPredictions"));
+        userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getPrediction(userDetailsResponse.getUserId(), null)).withRel("userPrediction"));
 
         return userDetailsResponse;
     }

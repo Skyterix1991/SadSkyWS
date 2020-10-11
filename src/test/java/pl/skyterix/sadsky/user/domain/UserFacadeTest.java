@@ -2,14 +2,14 @@ package pl.skyterix.sadsky.user.domain;
 
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Visitor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,30 +23,26 @@ import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserFacadeTest {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    @Autowired
     private JpaModelMapper jpaModelMapper;
 
-    @SpyBean
+    @Autowired
     private UserFacade userFacade;
 
     @MockBean
@@ -62,8 +58,6 @@ class UserFacadeTest {
 
     @BeforeEach
     void beforeEach() {
-        jpaModelMapper = new JpaModelMapper(entityManager);
-
         userDTO = new UserDTO();
         userDTO.setUserId(UUID.randomUUID());
         userDTO.setFirstName("Jan");
@@ -75,18 +69,6 @@ class UserFacadeTest {
         userDTO.setGroup(new AdminGroup());
 
         user = jpaModelMapper.mapEntity(userDTO, User.class);
-
-        mockAuthentication();
-    }
-
-    private void mockAuthentication() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId(UUID.randomUUID());
-        userDTO.setGroup(new AdminGroup());
-
-        User currentUser = jpaModelMapper.mapEntity(userDTO, User.class);
-
-        doReturn(currentUser).when(userFacade).getAuthenticatedUser();
     }
 
     @Test
@@ -107,7 +89,7 @@ class UserFacadeTest {
         // When
         when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(true);
         // Then
-        Assertions.assertThrows(RecordAlreadyExistsException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
+        assertThrows(RecordAlreadyExistsException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
 
     @Test
@@ -117,7 +99,7 @@ class UserFacadeTest {
         // When
         when(userRepository.existsByUserId(any())).thenReturn(false);
         // Then
-        Assertions.assertThrows(RecordNotFoundException.class, () -> userFacade.deleteUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
+        assertThrows(RecordNotFoundException.class, () -> userFacade.deleteUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
     }
 
     @Test
@@ -197,8 +179,8 @@ class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Get users")
-    void givenPredicateAndPageable_whenGetUsers_thenReturnValidUsersList() {
+    @DisplayName("Get full users")
+    void givenPredicateAndPageable_whenGetFullUsers_thenReturnValidUsersList() {
         // Given
         // Needs to be manually created mockito not working with just any(Predicate.class)
         Predicate predicate = new Predicate() {
@@ -225,39 +207,101 @@ class UserFacadeTest {
         // Then
         assertEquals(
                 new PageImpl<>(Collections.singletonList(userDTO)).getSize(),
-                userFacade.getUsers(predicate, pageRequest).getSize()
+                userFacade.getFullUsers(predicate, pageRequest).getSize()
                 , "Received list length is not the same as original.");
     }
 
     @Test
-    @DisplayName("Get user")
-    void givenUserId_whenGetUser_thenReturnValidUser() {
+    @DisplayName("Get mini users")
+    void givenPredicateAndPageable_whenGetMiniUsers_thenReturnValidUsersList() {
+        // Given
+        // Needs to be manually created mockito not working with just any(Predicate.class)
+        Predicate predicate = new Predicate() {
+            @Override
+            public Predicate not() {
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public <R, C> R accept(Visitor<R, C> visitor, @Nullable C c) {
+                return null;
+            }
+
+            @Override
+            public Class<? extends Boolean> getType() {
+                return null;
+            }
+        };
+
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("desc"));
+        // When
+        when(userRepository.findAll(predicate, pageRequest)).thenReturn(new PageImpl<>(Collections.singletonList(user)));
+        // Then
+        Page<UserDTO> users = userFacade.getMiniUsers(predicate, pageRequest);
+
+        assertAll(() -> {
+            assertEquals(
+                    new PageImpl<>(Collections.singletonList(userDTO)).getSize(),
+                    users.getSize(),
+                    "Received list length is not the same as original.");
+            assertNull(users.getContent().get(0).getLastName(), "Sensitive data is exposed.");
+        });
+    }
+
+    @Test
+    @DisplayName("Get full user")
+    void givenUserId_whenGetFullUser_thenReturnValidUser() {
         // Given
         // When
         when(userRepository.findUserByUserId(any())).thenReturn(Optional.of(user));
         // Then
         userDTO.setPassword(null);
 
-        assertEquals(userDTO, userFacade.getUser(UUID.randomUUID()), "Received user is not the same as original.");
+        assertEquals(userDTO, userFacade.getFullUser(UUID.randomUUID()), "Received user is not the same as original.");
     }
 
     @Test
-    @DisplayName("Get user by non existing uuid")
-    void givenNonExistingUserId_whenGetUser_thenReturnValidUser() {
+    @DisplayName("Get full user by non existing uuid")
+    void givenNonExistingUserId_whenGetFullUser_thenReturnValidUser() {
         // Given
         // When
         when(userRepository.findUserByUserId(any())).thenReturn(Optional.empty());
         // Then
-        assertThrows(RecordNotFoundException.class, () -> userFacade.getUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
+        assertThrows(RecordNotFoundException.class, () -> userFacade.getFullUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Get mini user")
+    void givenUserId_whenGetMiniUser_thenReturnValidUser() {
+        // Given
+        // When
+        when(userRepository.findUserByUserId(any())).thenReturn(Optional.of(user));
+        // Then
+        userDTO.setPassword(null);
+
+        UserDTO miniUser = userFacade.getMiniUser(UUID.randomUUID());
+
+        assertAll(() -> {
+            assertNull(miniUser.getLastName(), "Sensitive data is exposed.");
+        });
+    }
+
+    @Test
+    @DisplayName("Get mini user by non existing uuid")
+    void givenNonExistingUserId_whenGetMiniUser_thenReturnValidUser() {
+        // Given
+        // When
+        when(userRepository.findUserByUserId(any())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.getMiniUser(UUID.randomUUID()), "RecordNotFoundException was not thrown.");
     }
 
     @Test
     @DisplayName("Get authenticated user")
-    void whenGetAuthenticatedUser_thenReturnValidUser() {
+    void whenGetAuthenticatedUser_thenReturnCurrentUser() {
         // Given
         // When
-        doCallRealMethod().when(userFacade).getAuthenticatedUser();
-
         SecurityContextHolder.setContext(securityContext);
 
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);

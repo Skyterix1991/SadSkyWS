@@ -10,4 +10,8 @@ public enum SelfPermission implements Permissions {
     UPDATE_SELF_USER,
 
     REPLACE_SELF_USER,
+
+    // Prediction permissions
+    GET_SELF_USER_PREDICTIONS,
+    GET_SELF_USER_PREDICTION
 }
