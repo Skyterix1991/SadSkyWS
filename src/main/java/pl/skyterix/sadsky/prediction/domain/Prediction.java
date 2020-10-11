@@ -26,6 +26,7 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,6 +76,9 @@ public class Prediction {
     @PrePersist
     protected void onCreate() {
         if (days == null) days = new ArrayList<>();
+
+        // Create first day
+        this.days = Collections.singletonList(new Day());
 
         this.predictionId = UUID.randomUUID();
 
