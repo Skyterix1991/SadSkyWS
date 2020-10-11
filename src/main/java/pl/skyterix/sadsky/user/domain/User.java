@@ -51,7 +51,7 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Prediction> predictions;

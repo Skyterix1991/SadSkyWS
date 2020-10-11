@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pl.skyterix.sadsky.exception.AgeNotMeetingRequired;
 import pl.skyterix.sadsky.exception.Errors;
+import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collections;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -29,6 +31,9 @@ class CreateUserAdapter implements CreateUserPort {
         // Checks is age between 16 and 100
         if (age < 16 || age > 100)
             throw new AgeNotMeetingRequired(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
+
+        // Create default prediction
+        userDTO.setPredictions(Collections.singleton(new PredictionDTO()));
 
         User user = userRepositoryAdapter.createUser(jpaModelMapper.mapEntity(userDTO, User.class));
 
