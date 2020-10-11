@@ -3,8 +3,8 @@ package pl.skyterix.sadsky.user.domain.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
-import pl.skyterix.sadsky.user.domain.prediction.domain.dto.PredictionDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

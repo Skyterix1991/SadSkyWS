@@ -7,12 +7,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
+import pl.skyterix.sadsky.prediction.domain.Prediction;
 import pl.skyterix.sadsky.user.domain.group.Permission;
 import pl.skyterix.sadsky.user.domain.group.Permissions;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.user.domain.group.strategy.UserGroup;
-import pl.skyterix.sadsky.user.domain.prediction.domain.Prediction;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.CascadeType;
