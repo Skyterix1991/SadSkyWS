@@ -26,6 +26,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -88,6 +89,7 @@ public class User {
     @PrePersist
     protected void onCreate() {
         if (group == null) group = new UserGroup();
+        if (predictions == null) predictions = new HashSet<>();
 
         this.userId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();

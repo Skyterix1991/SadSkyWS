@@ -4,9 +4,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
+import pl.skyterix.sadsky.user.domain.prediction.domain.dto.PredictionDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -21,6 +23,10 @@ public class UserDTO {
     private LocalDate birthDay;
 
     private Short wakeHour;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<PredictionDTO> predictions;
 
     private String lastName;
 
