@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +23,6 @@ import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
@@ -36,19 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserFacadeTest {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    @Autowired
     private JpaModelMapper jpaModelMapper;
 
-    @SpyBean
+    @Autowired
     private UserFacade userFacade;
 
     @MockBean
@@ -64,8 +58,6 @@ class UserFacadeTest {
 
     @BeforeEach
     void beforeEach() {
-        jpaModelMapper = new JpaModelMapper(entityManager);
-
         userDTO = new UserDTO();
         userDTO.setUserId(UUID.randomUUID());
         userDTO.setFirstName("Jan");
@@ -77,18 +69,6 @@ class UserFacadeTest {
         userDTO.setGroup(new AdminGroup());
 
         user = jpaModelMapper.mapEntity(userDTO, User.class);
-
-        mockAuthentication();
-    }
-
-    private void mockAuthentication() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId(UUID.randomUUID());
-        userDTO.setGroup(new AdminGroup());
-
-        User currentUser = jpaModelMapper.mapEntity(userDTO, User.class);
-
-        doReturn(currentUser).when(userFacade).getAuthenticatedUser();
     }
 
     @Test
@@ -319,11 +299,9 @@ class UserFacadeTest {
 
     @Test
     @DisplayName("Get authenticated user")
-    void whenGetAuthenticatedUser_thenReturnValidUser() {
+    void whenGetAuthenticatedUser_thenReturnCurrentUser() {
         // Given
         // When
-        doCallRealMethod().when(userFacade).getAuthenticatedUser();
-
         SecurityContextHolder.setContext(securityContext);
 
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);

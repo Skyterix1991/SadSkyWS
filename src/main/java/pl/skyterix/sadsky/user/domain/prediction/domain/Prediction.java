@@ -12,7 +12,6 @@ import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,7 +36,7 @@ public class Prediction {
     @Column(nullable = false, updatable = false)
     private UUID predictionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @QueryType(PropertyType.NONE)

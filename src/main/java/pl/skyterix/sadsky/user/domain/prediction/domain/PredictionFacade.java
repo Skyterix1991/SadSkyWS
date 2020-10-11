@@ -3,6 +3,7 @@ package pl.skyterix.sadsky.user.domain.prediction.domain;
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.user.domain.UserRepository;
 import pl.skyterix.sadsky.user.domain.prediction.domain.dto.MiniUserPredictionDTO;
 import pl.skyterix.sadsky.user.domain.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.util.JpaModelMapper;
@@ -16,6 +17,7 @@ public class PredictionFacade implements PredictionFacadePort {
 
     private final JpaModelMapper jpaModelMapper;
     private final PredictionRepository predictionRepository;
+    private final UserRepository userRepository;
     private final CreatePredictionPort createPredictionAdapter;
     private final DeletePredictionPort deletePredictionAdapter;
     private final UpdatePredictionPort updatePredictionAdapter;
@@ -50,6 +52,9 @@ public class PredictionFacade implements PredictionFacadePort {
      */
     @Override
     public Set<PredictionDTO> getFullUserPredictions(UUID userId) {
+        if (!userRepository.existsByUserId(userId))
+            throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId));
+
         Set<Prediction> predictions = predictionRepository.findAllByUserId(userId);
 
         return predictions.stream()
