@@ -14,6 +14,8 @@ import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,17 @@ public class Prediction {
     @QueryType(PropertyType.NONE)
     private User owner;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private DepressionResult depressionResult;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AnxietyResult anxietyResult;
+
+    @Column(updatable = false)
+    private LocalDate expireDate;
+
     @Column(updatable = false)
     private LocalDateTime createDate;
 
@@ -63,7 +77,11 @@ public class Prediction {
         if (days == null) days = new ArrayList<>();
 
         this.predictionId = UUID.randomUUID();
-        this.createDate = LocalDateTime.now();
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.expireDate = currentTime.toLocalDate().plusDays(7); // Expire in 7 days from now
+        this.createDate = currentTime;
     }
 
     @PreUpdate
