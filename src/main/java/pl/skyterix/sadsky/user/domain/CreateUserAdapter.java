@@ -33,7 +33,10 @@ class CreateUserAdapter implements CreateUserPort {
             throw new AgeNotMeetingRequired(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
 
         // Create default prediction
-        userDTO.setPredictions(Collections.singleton(new PredictionDTO()));
+        PredictionDTO predictionDTO = new PredictionDTO();
+        predictionDTO.setOwner(userDTO);
+
+        userDTO.setPredictions(Collections.singleton(predictionDTO));
 
         User user = userRepositoryAdapter.createUser(jpaModelMapper.mapEntity(userDTO, User.class));
 
