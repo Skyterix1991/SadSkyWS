@@ -1,4 +1,4 @@
-package pl.skyterix.sadsky.prediction.domain;
+package pl.skyterix.sadsky.prediction.domain.day.domain;
 
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
@@ -7,18 +7,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
-import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
-import pl.skyterix.sadsky.user.domain.User;
+import pl.skyterix.sadsky.prediction.domain.Prediction;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-public class Prediction {
+public class Day {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -39,16 +39,28 @@ public class Prediction {
 
     @NaturalId
     @Column(nullable = false, updatable = false)
-    private UUID predictionId;
+    private UUID dayId;
 
-    @OneToMany(mappedBy = "prediction", cascade = CascadeType.ALL)
-    private List<Day> days;
+    @Column
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Emotion.class)
+    private List<Emotion> morningEmotions;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Emotion.class)
+    private List<Emotion> afternoonEmotions;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Emotion.class)
+    private List<Emotion> eveningEmotions;
 
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @QueryType(PropertyType.NONE)
-    private User owner;
+    private Prediction prediction;
 
     @Column(updatable = false)
     private LocalDateTime createDate;
@@ -60,9 +72,11 @@ public class Prediction {
 
     @PrePersist
     protected void onCreate() {
-        if (days == null) days = new ArrayList<>();
+        if (morningEmotions == null) morningEmotions = new ArrayList<>();
+        if (afternoonEmotions == null) afternoonEmotions = new ArrayList<>();
+        if (eveningEmotions == null) eveningEmotions = new ArrayList<>();
 
-        this.predictionId = UUID.randomUUID();
+        this.dayId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();
     }
 
