@@ -18,32 +18,7 @@ public class PredictionFacade implements PredictionFacadePort {
     private final JpaModelMapper jpaModelMapper;
     private final PredictionRepository predictionRepository;
     private final UserRepository userRepository;
-    private final CreatePredictionPort createPredictionAdapter;
-    private final DeletePredictionPort deletePredictionAdapter;
-    private final UpdatePredictionPort updatePredictionAdapter;
-    private final ReplacePredictionPort replacePredictionAdapter;
     private final GeneratePredictionResultPort generatePredictionResultAdapter;
-
-    /**
-     * Creates prediction based on input given in PredictionDTO validated before by request validators.
-     *
-     * @param predictionDTO Prediction to create.
-     * @return Created prediction UUID.
-     */
-    @Override
-    public UUID createPrediction(PredictionDTO predictionDTO) {
-        return createPredictionAdapter.createPrediction(predictionDTO);
-    }
-
-    /**
-     * Deletes prediction by predictionId.
-     *
-     * @param predictionId Prediction UUID.
-     */
-    @Override
-    public void deletePrediction(UUID predictionId) {
-        deletePredictionAdapter.deletePrediction(predictionId);
-    }
 
     /**
      * Get user predictions in Set with full user details.
@@ -110,30 +85,6 @@ public class PredictionFacade implements PredictionFacadePort {
         MiniUserPredictionDTO miniUserPredictionDTO = jpaModelMapper.mapEntity(predictionDTO, MiniUserPredictionDTO.class);
 
         return jpaModelMapper.mapEntity(miniUserPredictionDTO, PredictionDTO.class);
-    }
-
-    /**
-     * Updates prediction by predictionId based on input given in PredictionDTO validated before by request validators.
-     * Update will only be performed on field if its value is different than null.
-     *
-     * @param predictionId  Prediction UUID.
-     * @param predictionDTO Updated prediction.
-     */
-    @Override
-    public void updatePrediction(UUID predictionId, PredictionDTO predictionDTO) {
-        updatePredictionAdapter.updatePrediction(predictionId, predictionDTO);
-    }
-
-    /**
-     * Replaces prediction by predictionId based on input given in PredictionDTO validated before by request validators.
-     * All fields will be overwritten.
-     *
-     * @param predictionId  Prediction UUID.
-     * @param predictionDTO Replaced prediction.
-     */
-    @Override
-    public void replacePrediction(UUID predictionId, PredictionDTO predictionDTO) {
-        replacePredictionAdapter.replacePrediction(predictionId, predictionDTO);
     }
 
     @Override

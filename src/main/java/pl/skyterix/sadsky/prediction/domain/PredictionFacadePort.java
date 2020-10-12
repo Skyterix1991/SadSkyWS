@@ -14,13 +14,5 @@ interface PredictionFacadePort {
 
     PredictionDTO getMiniUserPrediction(UUID userId, UUID predictionId);
 
-    void updatePrediction(UUID predictionId, PredictionDTO predictionDTO);
-
-    void replacePrediction(UUID predictionId, PredictionDTO predictionDTO);
-
-    UUID createPrediction(PredictionDTO predictionDTO);
-
-    void deletePrediction(UUID predictionId);
-
     void generatePredictionResult(UUID userId, UUID predictionId);
 }

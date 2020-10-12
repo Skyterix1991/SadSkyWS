@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,36 +53,6 @@ class PredictionFacadeTest {
         predictionDTO.setOwner(userDTO);
 
         prediction = jpaModelMapper.mapEntity(predictionDTO, Prediction.class);
-    }
-
-    @Test
-    @DisplayName("Create prediction")
-    void givenPredictionDTO_whenCreatePrediction_thenReturnPredictionId() {
-        // Given
-        // When
-        when(predictionRepository.save(any())).thenReturn(prediction);
-        // Then
-        assertEquals(predictionDTO.getPredictionId(), predictionFacade.createPrediction(predictionDTO), "Returned uuid is valid.");
-    }
-
-    @Test
-    @DisplayName("Delete prediction")
-    void givenPredictionId_whenDeletePrediction_thenRunSuccessfully() {
-        // Given
-        // When
-        when(predictionRepository.existsByPredictionId(any())).thenReturn(true);
-        // Then
-        assertDoesNotThrow(() -> predictionFacade.deletePrediction(UUID.randomUUID()), "Exception was thrown.");
-    }
-
-    @Test
-    @DisplayName("Delete prediction with non existing uuid")
-    void givenNonExistingPredictionId_whenDeletePrediction_thenRunSuccessfully() {
-        // Given
-        // When
-        when(predictionRepository.existsByPredictionId(any())).thenReturn(false);
-        // Then
-        assertThrows(RecordNotFoundException.class, () -> predictionFacade.deletePrediction(UUID.randomUUID()), "Exception was not thrown.");
     }
 
     @Test
@@ -188,43 +157,4 @@ class PredictionFacadeTest {
         assertThrows(RecordNotFoundException.class, () -> predictionFacade.getMiniUserPrediction(UUID.randomUUID(), UUID.randomUUID()), "Exception was not thrown.");
     }
 
-    @Test
-    @DisplayName("Update prediction")
-    void givenPredictionIdAndPredictionDTO_whenUpdatePrediction_thenRunSuccessfully() {
-        // Given
-        // When
-        when(predictionRepository.findPredictionByPredictionId(any())).thenReturn(Optional.of(prediction));
-        // Then
-        assertDoesNotThrow(() -> predictionFacade.updatePrediction(UUID.randomUUID(), predictionDTO), "Exception was thrown.");
-    }
-
-    @Test
-    @DisplayName("Update prediction by non existing uuid")
-    void givenNonExistingPredictionIdAndPredictionDTO_whenUpdatePrediction_thenThrowRecordNotFoundException() {
-        // Given
-        // When
-        when(predictionRepository.findPredictionByPredictionId(any())).thenReturn(Optional.empty());
-        // Then
-        assertThrows(RecordNotFoundException.class, () -> predictionFacade.updatePrediction(UUID.randomUUID(), predictionDTO), "Exception was not thrown.");
-    }
-
-    @Test
-    @DisplayName("Replace prediction")
-    void givenPredictionIdAndPredictionDTO_whenReplacePrediction_thenRunSuccessfully() {
-        // Given
-        // When
-        when(predictionRepository.findPredictionByPredictionId(any())).thenReturn(Optional.of(prediction));
-        // Then
-        assertDoesNotThrow(() -> predictionFacade.replacePrediction(UUID.randomUUID(), predictionDTO), "Exception was thrown.");
-    }
-
-    @Test
-    @DisplayName("Replace prediction by non existing uuid")
-    void givenNonExistingPredictionIdAndPredictionDTO_whenReplacePrediction_thenThrowRecordNotFoundException() {
-        // Given
-        // When
-        when(predictionRepository.findPredictionByPredictionId(any())).thenReturn(Optional.empty());
-        // Then
-        assertThrows(RecordNotFoundException.class, () -> predictionFacade.replacePrediction(UUID.randomUUID(), predictionDTO), "Exception was not thrown.");
-    }
 }

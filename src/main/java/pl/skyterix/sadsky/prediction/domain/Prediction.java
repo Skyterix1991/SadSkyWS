@@ -4,7 +4,6 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
@@ -16,6 +15,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,7 +33,6 @@ import java.util.stream.IntStream;
 
 @Entity
 @Data
-@NoArgsConstructor
 public class Prediction {
 
     private final static short EXPIRE_DAYS = 7;
@@ -48,7 +47,7 @@ public class Prediction {
     @Column(nullable = false, updatable = false)
     private UUID predictionId;
 
-    @OneToMany(mappedBy = "prediction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "prediction", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Day> days;
 
     @ManyToOne
@@ -79,6 +78,13 @@ public class Prediction {
     @EqualsAndHashCode.Exclude
     private LocalDateTime updateDate;
 
+    public Prediction() {
+        // Create each Day for expire day and assign its number in day constructor
+        this.days = IntStream.range(1, EXPIRE_DAYS + 1)
+                .mapToObj(Day::new)
+                .collect(Collectors.toList());
+    }
+
     @PrePersist
     protected void onCreate() {
         if (days == null) days = new ArrayList<>();
@@ -86,11 +92,6 @@ public class Prediction {
         this.predictionId = UUID.randomUUID();
         // Assign expire days in case of change of constant
         this.setExpireDays(EXPIRE_DAYS);
-
-        // Create each Day for expire day and assign its number in day constructor
-        this.days = IntStream.range(1, EXPIRE_DAYS + 1)
-                .mapToObj(Day::new)
-                .collect(Collectors.toList());
 
         LocalDateTime currentTime = LocalDateTime.now();
 

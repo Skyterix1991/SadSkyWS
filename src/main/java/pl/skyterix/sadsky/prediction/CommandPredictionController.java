@@ -3,6 +3,7 @@ package pl.skyterix.sadsky.prediction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,7 +19,7 @@ import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/predictions")
+@RequestMapping("/users/{userId}/predictions")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class CommandPredictionController implements CommandPredictionControllerPort {
 
@@ -28,7 +29,7 @@ class CommandPredictionController implements CommandPredictionControllerPort {
     @Override
     @PostMapping("/{predictionId}/result/generate")
     @ResponseStatus(HttpStatus.CREATED)
-    public void generateResults(UUID userId, UUID predictionId) {
+    public void generateResults(@PathVariable UUID userId, @PathVariable UUID predictionId) {
         User currentUser = userFacade.getAuthenticatedUser();
 
         // Checks if currentUser has permission to generate prediction for that user

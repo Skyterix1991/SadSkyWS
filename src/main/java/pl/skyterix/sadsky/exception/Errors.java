@@ -18,7 +18,8 @@ public enum Errors {
     GROUP_NOT_FOUND("Group with name {0} was not found."),
     SORT_NOT_ALLOWED_ON_FIELD("Sorting by {0} is not allowed."),
     AGE_NOT_MEETING_REQUIRED("Your age must be between 16 and 100 years."),
-    PREDICTION_RESULT_NOT_READY_TO_GENERATE("Prediction result is not ready to generate.");
+    PREDICTION_RESULT_NOT_READY_TO_GENERATE("Prediction result is not ready to generate."),
+    PREDICTION_RESULT_IS_ALREADY_GENERATED("Prediction result was already generated.");
 
     private final String errorMessage;
 

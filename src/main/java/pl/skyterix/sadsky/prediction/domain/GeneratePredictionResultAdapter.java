@@ -67,7 +67,7 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
     @SneakyThrows
     private Instances runKnnOnDataset(String datasetPath, int positiveScore, int negativeScore) {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(datasetPath.toString());
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(datasetPath);
 
         assert inputStream != null;
 
@@ -142,6 +142,7 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
 
         int expireDays = prediction.getExpireDays();
+
         Day lastDay = prediction.getDays().stream()
                 .filter(day -> day.getDayNumber() == expireDays - 1) // Find last day in array
                 .findFirst()
