@@ -47,7 +47,7 @@ public class Prediction {
     @Column(nullable = false, updatable = false)
     private UUID predictionId;
 
-    @OneToMany(mappedBy = "prediction", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Day> days;
 
     @ManyToOne

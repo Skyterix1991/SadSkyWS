@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
-import pl.skyterix.sadsky.prediction.domain.Prediction;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.Column;
@@ -15,11 +14,9 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
@@ -60,12 +57,6 @@ public class Day {
     @Enumerated(EnumType.STRING)
     @ElementCollection(targetClass = Emotion.class)
     private List<Emotion> eveningEmotions;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @QueryType(PropertyType.NONE)
-    private Prediction prediction;
 
     @Column(updatable = false)
     private LocalDateTime createDate;
