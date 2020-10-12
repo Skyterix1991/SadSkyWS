@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
@@ -196,7 +197,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         adminUser.setLastName("Kowalski");
         adminUser.setBirthDay(LocalDate.now().minusYears(16));
         adminUser.setEmail("admin@admin.pl");
-        adminUser.setPassword("admin");
+        adminUser.setEncryptedPassword(new BCryptPasswordEncoder().encode("admin"));
         adminUser.setGroup(new AdminGroup());
 
         PredictionDTO predictionDTO = new PredictionDTO();
