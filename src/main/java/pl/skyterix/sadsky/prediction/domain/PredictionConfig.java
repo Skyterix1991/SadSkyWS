@@ -26,7 +26,8 @@ class PredictionConfig {
                 new CreatePredictionAdapter(predictionRepositoryAdapter, jpaModelMapper),
                 new DeletePredictionAdapter(predictionRepositoryAdapter),
                 new UpdatePredictionAdapter(predictionRepositoryAdapter),
-                new ReplacePredictionAdapter(predictionRepositoryAdapter)
+                new ReplacePredictionAdapter(predictionRepositoryAdapter),
+                new GeneratePredictionResultAdapter(predictionRepositoryAdapter, userRepository)
         );
     }
 

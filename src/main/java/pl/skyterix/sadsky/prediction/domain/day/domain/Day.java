@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.ToIntFunction;
 
 @Entity
 @Data
@@ -40,6 +41,9 @@ public class Day {
     @NaturalId
     @Column(nullable = false, updatable = false)
     private UUID dayId;
+
+    @Column(nullable = false, updatable = false)
+    private int dayNumber;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -70,6 +74,10 @@ public class Day {
     @EqualsAndHashCode.Exclude
     private LocalDateTime updateDate;
 
+    public Day(int dayNumber) {
+        this.dayNumber = dayNumber;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (morningEmotions == null) morningEmotions = new ArrayList<>();
@@ -83,5 +91,21 @@ public class Day {
     @PreUpdate
     protected void onUpdate() {
         this.updateDate = LocalDateTime.now();
+    }
+
+    public int countPoints(ToIntFunction<Emotion> toIntFunction) {
+        int morningPoints = this.getMorningEmotions().stream()
+                .mapToInt(toIntFunction)
+                .sum();
+
+        int afternoonPoints = this.getAfternoonEmotions().stream()
+                .mapToInt(toIntFunction)
+                .sum();
+
+        int eveningPoints = this.getEveningEmotions().stream()
+                .mapToInt(toIntFunction)
+                .sum();
+
+        return morningPoints + afternoonPoints + eveningPoints;
     }
 }

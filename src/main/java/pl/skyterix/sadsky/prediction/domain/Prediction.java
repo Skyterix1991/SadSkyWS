@@ -26,14 +26,17 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class Prediction {
+
+    private final static short EXPIRE_DAYS = 7;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -62,6 +65,9 @@ public class Prediction {
     @Enumerated(EnumType.STRING)
     private AnxietyResult anxietyResult;
 
+    @Column(nullable = false, updatable = false)
+    private int expireDays;
+
     @Column(updatable = false)
     private LocalDate expireDate;
 
@@ -77,14 +83,18 @@ public class Prediction {
     protected void onCreate() {
         if (days == null) days = new ArrayList<>();
 
-        // Create first day
-        this.days = Collections.singletonList(new Day());
-
         this.predictionId = UUID.randomUUID();
+        // Assign expire days in case of change of constant
+        this.setExpireDays(EXPIRE_DAYS);
+
+        // Create each Day for expire day and assign its number in day constructor
+        this.days = IntStream.range(1, EXPIRE_DAYS + 1)
+                .mapToObj(Day::new)
+                .collect(Collectors.toList());
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        this.expireDate = currentTime.toLocalDate().plusDays(7); // Expire in 7 days from now
+        this.expireDate = currentTime.toLocalDate().plusDays(EXPIRE_DAYS); // Expire in 7 days from now
         this.createDate = currentTime;
     }
 

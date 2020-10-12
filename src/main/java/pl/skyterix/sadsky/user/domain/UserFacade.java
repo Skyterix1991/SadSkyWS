@@ -10,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
+import pl.skyterix.sadsky.prediction.domain.day.domain.dto.DayDTO;
+import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.dto.MiniUserDTO;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
@@ -17,9 +20,13 @@ import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 public class UserFacade implements UserFacadePort, CommandLineRunner {
@@ -192,6 +199,38 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         adminUser.setPassword("admin");
         adminUser.setGroup(new AdminGroup());
 
-        createUser(adminUser);
+        PredictionDTO predictionDTO = new PredictionDTO();
+        predictionDTO.setOwner(adminUser);
+
+        // Generate fully filled days
+        List<DayDTO> days = IntStream.range(1, 8)
+                .mapToObj(dayNumber -> {
+                    DayDTO dayDTO = new DayDTO();
+                    dayDTO.setDayNumber(dayNumber);
+
+                    return dayDTO;
+                })
+                .peek(day -> {
+                    List<Emotion> emotions = new ArrayList<>();
+                    emotions.add(Emotion.ACTIVE);
+                    emotions.add(Emotion.DISHEARTENED);
+                    emotions.add(Emotion.HELPLESS);
+                    emotions.add(Emotion.HOLLOW);
+                    emotions.add(Emotion.BRUNT);
+                    emotions.add(Emotion.LONELY);
+
+                    day.setMorningEmotions(emotions);
+                    day.setAfternoonEmotions(emotions);
+                    day.setEveningEmotions(emotions);
+                }).collect(Collectors.toList());
+
+        predictionDTO.setDays(days);
+        // Make sure prediction expires this day
+        predictionDTO.setExpireDate(LocalDate.now());
+
+        adminUser.setPredictions(new HashSet<>());
+        adminUser.getPredictions().add(predictionDTO);
+
+        userRepository.save(jpaModelMapper.mapEntity(adminUser, User.class));
     }
 }

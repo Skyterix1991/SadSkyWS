@@ -13,5 +13,7 @@ public enum SelfPermission implements Permissions {
 
     // Prediction permissions
     GET_SELF_USER_PREDICTIONS,
-    GET_SELF_USER_PREDICTION
+    GET_SELF_USER_PREDICTION,
+
+    GENERATE_SELF_PREDICTION_RESULT
 }

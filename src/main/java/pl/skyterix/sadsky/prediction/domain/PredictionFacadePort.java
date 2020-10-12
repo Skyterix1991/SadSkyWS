@@ -21,4 +21,6 @@ interface PredictionFacadePort {
     UUID createPrediction(PredictionDTO predictionDTO);
 
     void deletePrediction(UUID predictionId);
+
+    void generatePredictionResult(UUID userId, UUID predictionId);
 }

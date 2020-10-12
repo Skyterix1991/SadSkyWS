@@ -6,13 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Repository
 @Transactional
-interface PredictionRepository extends JpaRepository<Prediction, Long> {
+public interface PredictionRepository extends JpaRepository<Prediction, Long> {
     @Query("from Prediction p where p.owner.userId = ?1 and p.predictionId = ?2")
     Optional<Prediction> findPredictionByUserIdAndPredictionId(UUID userId, UUID predictionId);
 
@@ -24,4 +25,7 @@ interface PredictionRepository extends JpaRepository<Prediction, Long> {
     Set<Prediction> findAllByUserId(UUID userId);
 
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
+
+    @Query("from Prediction where expireDate > current_date")
+    List<Prediction> findAllExpired();
 }

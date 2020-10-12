@@ -22,6 +22,7 @@ public class PredictionFacade implements PredictionFacadePort {
     private final DeletePredictionPort deletePredictionAdapter;
     private final UpdatePredictionPort updatePredictionAdapter;
     private final ReplacePredictionPort replacePredictionAdapter;
+    private final GeneratePredictionResultPort generatePredictionResultAdapter;
 
     /**
      * Creates prediction based on input given in PredictionDTO validated before by request validators.
@@ -133,6 +134,11 @@ public class PredictionFacade implements PredictionFacadePort {
     @Override
     public void replacePrediction(UUID predictionId, PredictionDTO predictionDTO) {
         replacePredictionAdapter.replacePrediction(predictionId, predictionDTO);
+    }
+
+    @Override
+    public void generatePredictionResult(UUID userId, UUID predictionId) {
+        generatePredictionResultAdapter.generatePredictionResult(userId, predictionId);
     }
 
 }

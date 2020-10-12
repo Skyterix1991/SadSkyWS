@@ -1,0 +1,32 @@
+@relation depression
+
+@attribute positive numeric
+@attribute negative numeric
+@attribute prediction {Positive, Negative}
+
+@data
+147,0,Negative
+147,5,Negative
+147,10,Negative
+147,20,Negative
+147,30,Negative
+147,40,Negative
+147,50,Negative
+147,60,Negative
+130,50,Negative
+120,40,Negative
+110,30,Negative
+100,20,Negative
+147,80,Positive
+137,100,Positive
+127,100,Positive
+117,100,Positive
+80,190,Positive
+107,190,Positive
+90,180,Positive
+107,170,Positive
+107,231,Positive
+90,100,Positive
+80,120,Positive
+40,150,Positive
+10,200,Positive
