@@ -226,8 +226,6 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
                 }).collect(Collectors.toList());
 
         predictionDTO.setDays(days);
-        // Make sure prediction expires this day
-        predictionDTO.setExpireDate(LocalDate.now());
 
         adminUser.setPredictions(new HashSet<>());
         adminUser.getPredictions().add(predictionDTO);

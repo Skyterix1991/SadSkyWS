@@ -83,6 +83,9 @@ public class Prediction {
         this.days = IntStream.range(1, EXPIRE_DAYS + 1)
                 .mapToObj(Day::new)
                 .collect(Collectors.toList());
+
+        // Assign expire days in case of change of constant
+        this.setExpireDays(EXPIRE_DAYS);
     }
 
     @PrePersist
@@ -90,8 +93,6 @@ public class Prediction {
         if (days == null) days = new ArrayList<>();
 
         this.predictionId = UUID.randomUUID();
-        // Assign expire days in case of change of constant
-        this.setExpireDays(EXPIRE_DAYS);
 
         LocalDateTime currentTime = LocalDateTime.now();
 

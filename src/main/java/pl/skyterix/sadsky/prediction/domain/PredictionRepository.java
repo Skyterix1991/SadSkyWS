@@ -26,6 +26,6 @@ public interface PredictionRepository extends JpaRepository<Prediction, Long> {
 
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
 
-    @Query("from Prediction where expireDate > current_date")
+    @Query("from Prediction where expireDate > current_date and depressionResult is null")
     List<Prediction> findAllExpired();
 }

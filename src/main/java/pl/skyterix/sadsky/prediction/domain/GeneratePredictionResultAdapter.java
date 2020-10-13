@@ -3,6 +3,7 @@ package pl.skyterix.sadsky.prediction.domain;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import pl.skyterix.sadsky.exception.Errors;
+import pl.skyterix.sadsky.exception.PredictionResultIsAlreadyGeneratedException;
 import pl.skyterix.sadsky.exception.PredictionResultIsNotReadyToGenerateException;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
@@ -39,6 +40,10 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString())));
 
         Prediction prediction = predictionRepositoryAdapter.findByPredictionId(predictionId);
+
+        // Is prediction already generated
+        if (prediction.getDepressionResult() != null)
+            throw new PredictionResultIsAlreadyGeneratedException(Errors.PREDICTION_RESULT_IS_ALREADY_GENERATED.getErrorMessage());
 
         // Check if prediction is not ready to generate results and throw exception if that's the case
         if (!isPredictionReady(user, prediction))
@@ -139,7 +144,6 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         // Is prediction expired
         if (currentTime.isAfter(prediction.getExpireDate()))
             return true;
-
 
         int expireDays = prediction.getExpireDays();
 
