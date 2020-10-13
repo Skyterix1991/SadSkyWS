@@ -3,6 +3,7 @@ package pl.skyterix.sadsky.prediction.domain;
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
 import pl.skyterix.sadsky.prediction.domain.dto.MiniUserPredictionDTO;
 import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.UserRepository;
@@ -19,6 +20,7 @@ public class PredictionFacade implements PredictionFacadePort {
     private final PredictionRepository predictionRepository;
     private final UserRepository userRepository;
     private final GeneratePredictionResultPort generatePredictionResultAdapter;
+    private final SetPredictionDayEmotionsPort setPredictionDayEmotionsAdapter;
 
     /**
      * Get user predictions in Set with full user details.
@@ -90,6 +92,11 @@ public class PredictionFacade implements PredictionFacadePort {
     @Override
     public void generatePredictionResult(UUID userId, UUID predictionId) {
         generatePredictionResultAdapter.generatePredictionResult(userId, predictionId);
+    }
+
+    @Override
+    public void setPredictionDayEmotions(UUID userId, UUID predictionId, Set<Emotion> emotions) {
+        setPredictionDayEmotionsAdapter.setPredictionDayEmotions(userId, predictionId, emotions);
     }
 
 }

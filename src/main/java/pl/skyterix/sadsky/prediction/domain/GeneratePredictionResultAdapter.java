@@ -28,9 +28,6 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
     private final PredictionRepositoryPort predictionRepositoryAdapter;
     private final UserRepository userRepository;
 
-    // An integer of hours between each part of day ex. Wake hour is 7 so for 5 hours deadlines are 12 (morning), 17 (afternoon), 22 (noon)
-    private final static int DAY_PART_HOURS = 5;
-
     private final static String DEPRESSION_DATASET_PATH = "datasets/depression.arff";
     private final static String ANXIETY_DATASET_PATH = "datasets/anxiety.arff";
 
@@ -153,7 +150,8 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 .orElseThrow(() -> new IllegalStateException("Missing last day of prediction."));
 
         int currentHour = LocalDateTime.now().getHour();
-        int lastFillDeadline = user.getWakeHour() + DAY_PART_HOURS * 3; // Calculate last emotion deadline for last day
+        // Calculate last emotion deadline for last day
+        int lastFillDeadline = user.getWakeHour() + Day.DAY_PART_HOURS * 3;
 
         // Is it a prediction expiration day
         if (currentTime.isEqual(prediction.getExpireDate()))

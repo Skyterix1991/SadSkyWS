@@ -7,7 +7,7 @@ import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
 import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -17,11 +17,11 @@ public class DayDTO {
 
     private UUID dayId;
 
-    private List<Emotion> morningEmotions;
+    private Set<Emotion> morningEmotions;
 
-    private List<Emotion> afternoonEmotions;
+    private Set<Emotion> afternoonEmotions;
 
-    private List<Emotion> eveningEmotions;
+    private Set<Emotion> eveningEmotions;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

@@ -3,14 +3,17 @@ package pl.skyterix.sadsky.prediction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.GroupUnauthorizedException;
 import pl.skyterix.sadsky.prediction.domain.PredictionFacade;
+import pl.skyterix.sadsky.prediction.domain.day.request.DayEmotionsRequest;
 import pl.skyterix.sadsky.user.domain.User;
 import pl.skyterix.sadsky.user.domain.UserFacade;
 import pl.skyterix.sadsky.user.domain.group.Permission;
@@ -25,6 +28,13 @@ class CommandPredictionController implements CommandPredictionControllerPort {
 
     private final UserFacade userFacade;
     private final PredictionFacade predictionFacade;
+
+    @Override
+    @PutMapping("/{predictionId}/days/current/emotions")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void setPredictionDayEmotions(@PathVariable UUID userId, @PathVariable UUID predictionId, @Validated DayEmotionsRequest dayEmotionsRequest) {
+        predictionFacade.setPredictionDayEmotions(userId, predictionId, dayEmotionsRequest.getEmotions());
+    }
 
     @Override
     @PostMapping("/{predictionId}/result/generate")

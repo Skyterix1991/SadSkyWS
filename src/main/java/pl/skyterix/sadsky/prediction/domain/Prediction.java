@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
+import pl.skyterix.sadsky.exception.Errors;
+import pl.skyterix.sadsky.exception.PredictionIsExpiredException;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
 import pl.skyterix.sadsky.user.domain.User;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
@@ -25,6 +27,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -103,5 +106,21 @@ public class Prediction {
     @PreUpdate
     protected void onUpdate() {
         this.updateDate = LocalDateTime.now();
+    }
+
+    public Day getCurrentDay() {
+        return this.days.stream()
+                .filter(day -> {
+                    Period period = Period.between(LocalDate.now(), expireDate);
+
+                    int currentDayNumber = (7 - period.getDays()) + 1; // Add one at the end cause day numerations starts from 1
+
+                    // Is prediction expired
+                    if (currentDayNumber > EXPIRE_DAYS)
+                        throw new PredictionIsExpiredException(Errors.PREDICTION_IS_EXPIRED.getErrorMessage());
+
+                    return day.getDayNumber() == currentDayNumber;
+                })
+                .findFirst().orElseThrow(() -> new IllegalStateException("Missing current day"));
     }
 }

@@ -26,8 +26,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -54,7 +54,7 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<Prediction> predictions;
+    private List<Prediction> predictions;
 
     @Column(nullable = false)
     private LocalDate birthDay;
@@ -89,7 +89,7 @@ public class User {
     @PrePersist
     protected void onCreate() {
         if (group == null) group = new UserGroup();
-        if (predictions == null) predictions = new HashSet<>();
+        if (predictions == null) predictions = new ArrayList<>();
 
         this.userId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();

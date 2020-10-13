@@ -21,10 +21,11 @@ import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -212,7 +213,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
                     return dayDTO;
                 })
                 .peek(day -> {
-                    List<Emotion> emotions = new ArrayList<>();
+                    Set<Emotion> emotions = new HashSet<>();
                     emotions.add(Emotion.ACTIVE);
                     emotions.add(Emotion.DISHEARTENED);
                     emotions.add(Emotion.HELPLESS);
@@ -227,8 +228,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
 
         predictionDTO.setDays(days);
 
-        adminUser.setPredictions(new HashSet<>());
-        adminUser.getPredictions().add(predictionDTO);
+        adminUser.setPredictions(Collections.singletonList(predictionDTO));
 
         userRepository.save(jpaModelMapper.mapEntity(adminUser, User.class));
     }

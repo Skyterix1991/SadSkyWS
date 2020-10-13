@@ -23,7 +23,8 @@ class PredictionConfig {
                 jpaModelMapper,
                 predictionRepository,
                 userRepository,
-                new GeneratePredictionResultAdapter(predictionRepositoryAdapter, userRepository)
+                new GeneratePredictionResultAdapter(predictionRepositoryAdapter, userRepository),
+                new SetPredictionDayEmotionsAdapter(predictionRepositoryAdapter, userRepository)
         );
     }
 

@@ -14,5 +14,7 @@ interface PredictionRepositoryPort {
 
     Prediction findByPredictionId(UUID predictionId);
 
+    Prediction findByUserIdAndPredictionId(UUID userId, UUID predictionId);
+
     boolean existsByPredictionId(UUID predictionId);
 }

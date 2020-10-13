@@ -36,7 +36,7 @@ class CreateUserAdapter implements CreateUserPort {
         PredictionDTO predictionDTO = new PredictionDTO();
         predictionDTO.setOwner(userDTO);
 
-        userDTO.setPredictions(Collections.singleton(predictionDTO));
+        userDTO.setPredictions(Collections.singletonList(predictionDTO));
 
         User user = userRepositoryAdapter.createUser(jpaModelMapper.mapEntity(userDTO, User.class));
 

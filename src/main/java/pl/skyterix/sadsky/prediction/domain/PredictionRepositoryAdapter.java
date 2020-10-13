@@ -46,4 +46,11 @@ class PredictionRepositoryAdapter implements PredictionRepositoryPort {
     public boolean existsByPredictionId(UUID predictionId) {
         return predictionRepository.existsByPredictionId(predictionId);
     }
+
+    @Override
+    public Prediction findByUserIdAndPredictionId(UUID userId, UUID predictionId) {
+        return predictionRepository.findPredictionByUserIdAndPredictionId(userId, predictionId)
+                .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(predictionId.toString())));
+    }
+
 }
