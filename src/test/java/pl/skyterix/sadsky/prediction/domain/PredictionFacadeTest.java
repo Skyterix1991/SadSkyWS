@@ -72,6 +72,8 @@ class PredictionFacadeTest {
         predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS));
         predictionDTO.setDays(days);
 
+        userDTO.setPredictions(Collections.singletonList(predictionDTO));
+
         prediction = jpaModelMapper.mapEntity(predictionDTO, Prediction.class);
     }
 
@@ -178,7 +180,14 @@ class PredictionFacadeTest {
     }
 
     @Test
-    void generatePredictionResult() {
+    @DisplayName("Generate prediction result")
+    void givenUserIdAndPredictionId_whenGeneratePredictionResult_thenRunSuccessfully() {
+        // Given
+        prediction.setExpireDate(LocalDate.now().minusDays(1));
+        // When
+        when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any())).thenReturn(Optional.of(prediction));
+        // Then
+        assertDoesNotThrow(() -> predictionFacade.generatePredictionResult(UUID.randomUUID(), UUID.randomUUID()), "Exception was thrown.");
     }
 
     @Test

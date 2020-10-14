@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.PredictionResultIsAlreadyGeneratedException;
 import pl.skyterix.sadsky.exception.PredictionResultIsNotReadyToGenerateException;
-import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
 import pl.skyterix.sadsky.user.domain.User;
@@ -33,10 +32,9 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
     @Override
     public void generatePredictionResult(UUID userId, UUID predictionId) {
-        User user = userRepository.findUserByUserId(userId)
-                .orElseThrow(() -> new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString())));
+        Prediction prediction = predictionRepositoryAdapter.findByUserIdAndPredictionId(userId, predictionId);
 
-        Prediction prediction = predictionRepositoryAdapter.findByPredictionId(predictionId);
+        User user = prediction.getOwner();
 
         // Is prediction already generated
         if (prediction.getDepressionResult() != null)
@@ -65,6 +63,8 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         // Create new prediction
         user.getPredictions().add(new Prediction());
+
+        userRepository.save(user);
     }
 
     @SneakyThrows
@@ -96,14 +96,22 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 negativeAnxietyScore
         );
 
-        long positivePredictions = nearestInstances.stream()
+        long severePredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("Positive"))
+                .filter(predicate -> predicate.equals("SEVERE_ANXIETY"))
                 .count();
 
-        // If number of positive predictions is higher than all results
-        if (positivePredictions >= nearestInstances.numInstances())
-            return AnxietyResult.POSITIVE;
+        long mildPredictions = nearestInstances.stream()
+                .map(instance -> instance.stringValue(2))
+                .filter(predicate -> predicate.equals("MILD_ANXIETY"))
+                .count();
+
+        // If number of severe predictions is higher than mild predictions and higher than negative predictions
+        if (severePredictions > mildPredictions && severePredictions > nearestInstances.numInstances())
+            return AnxietyResult.SEVERE_ANXIETY;
+            // If number of mild predictions is higher than severe predictions and higher than negative predictions
+        else if (mildPredictions > severePredictions && mildPredictions > nearestInstances.numInstances())
+            return AnxietyResult.MILD_ANXIETY;
         else
             return AnxietyResult.NEGATIVE;
     }
@@ -116,14 +124,22 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 negativeDepressionScore
         );
 
-        long positivePredictions = nearestInstances.stream()
+        long severePredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("Positive"))
+                .filter(predicate -> predicate.equals("SEVERE_DEPRESSION"))
                 .count();
 
-        // If number of positive predictions is higher than all results
-        if (positivePredictions >= nearestInstances.numInstances())
-            return DepressionResult.POSITIVE;
+        long mildPredictions = nearestInstances.stream()
+                .map(instance -> instance.stringValue(2))
+                .filter(predicate -> predicate.equals("MILD_DEPRESSION"))
+                .count();
+
+        // If number of severe predictions is higher than mild predictions and higher than negative predictions
+        if (severePredictions > mildPredictions && severePredictions > nearestInstances.numInstances())
+            return DepressionResult.SEVERE_DEPRESSION;
+            // If number of mild predictions is higher than severe predictions and higher than negative predictions
+        else if (mildPredictions > severePredictions && mildPredictions > nearestInstances.numInstances())
+            return DepressionResult.MILD_DEPRESSION;
         else
             return DepressionResult.NEGATIVE;
     }

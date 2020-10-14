@@ -1,5 +1,5 @@
 package pl.skyterix.sadsky.prediction.domain;
 
 public enum DepressionResult {
-    NEGATIVE, POSITIVE
+    SEVERE_DEPRESSION, MILD_DEPRESSION, NEGATIVE
 }

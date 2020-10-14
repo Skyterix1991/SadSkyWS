@@ -76,15 +76,15 @@ public class Day {
     private LocalDateTime updateDate;
 
     public Day(int dayNumber) {
+        this.morningEmotions = new HashSet<>();
+        this.afternoonEmotions = new HashSet<>();
+        this.eveningEmotions = new HashSet<>();
+
         this.dayNumber = dayNumber;
     }
 
     @PrePersist
     protected void onCreate() {
-        if (morningEmotions == null) morningEmotions = new HashSet<>();
-        if (afternoonEmotions == null) afternoonEmotions = new HashSet<>();
-        if (eveningEmotions == null) eveningEmotions = new HashSet<>();
-
         this.dayId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();
     }

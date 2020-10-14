@@ -87,15 +87,16 @@ public class User {
     private LocalDateTime updateDate;
 
     public User() {
+        this.group = new UserGroup();
+        this.predictions = new ArrayList<>();
+
         this.wakeHour = DEFAULT_WAKE_HOUR;
     }
 
     @PrePersist
     protected void onCreate() {
-        if (group == null) group = new UserGroup();
-        if (predictions == null) predictions = new ArrayList<>();
-
         this.userId = UUID.randomUUID();
+
         this.createDate = LocalDateTime.now();
         this.lastTokenRevokeDate = LocalDateTime.now();
     }

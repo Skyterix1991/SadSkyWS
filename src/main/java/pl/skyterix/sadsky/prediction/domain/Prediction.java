@@ -93,12 +93,12 @@ public class Prediction {
 
         // Assign expire days in case of change of constant
         this.setExpireDays(EXPIRE_DAYS);
+
+        this.days = new ArrayList<>();
     }
 
     @PrePersist
     protected void onCreate() {
-        if (days == null) days = new ArrayList<>();
-
         this.predictionId = UUID.randomUUID();
 
         LocalDateTime currentTime = LocalDateTime.now();
