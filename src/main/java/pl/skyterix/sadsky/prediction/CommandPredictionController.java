@@ -34,7 +34,13 @@ class CommandPredictionController implements CommandPredictionControllerPort {
     @PutMapping("/{predictionId}/days/current/emotions")
     @ResponseStatus(HttpStatus.CREATED)
     public void setPredictionDayEmotions(@PathVariable UUID userId, @PathVariable UUID predictionId, @RequestBody @Validated DayEmotionsRequest dayEmotionsRequest) {
-        predictionFacade.setPredictionDayEmotions(userId, predictionId, dayEmotionsRequest.getEmotions());
+        User currentUser = userFacade.getAuthenticatedUser();
+
+        // Checks if currentUser has permission to generate prediction for that user
+        if (currentUser.hasPermission(userId, SelfPermission.SET_SELF_PREDICTION_DAY_EMOTIONS, Permission.SET_PREDICTION_DAY_EMOTIONS)) {
+            predictionFacade.setPredictionDayEmotions(userId, predictionId, dayEmotionsRequest.getEmotions());
+        } else
+            throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
     }
 
     @Override
