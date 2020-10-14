@@ -34,6 +34,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Prediction class should be generated automatically for user.
+ * Each predictions consists of days generated automatically from EXPIRE_DAYS number.
+ */
 @Entity
 @Data
 public class Prediction {

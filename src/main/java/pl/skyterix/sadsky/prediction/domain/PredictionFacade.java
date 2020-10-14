@@ -89,11 +89,24 @@ public class PredictionFacade implements PredictionFacadePort {
         return jpaModelMapper.mapEntity(miniUserPredictionDTO, PredictionDTO.class);
     }
 
+    /**
+     * Generate prediction result using knn algorithm.
+     *
+     * @param userId       Owner of prediction UUID.
+     * @param predictionId Prediction UUID to generate results from.
+     */
     @Override
     public void generatePredictionResult(UUID userId, UUID predictionId) {
         generatePredictionResultAdapter.generatePredictionResult(userId, predictionId);
     }
 
+    /**
+     * Sets emotions for current day in current prediction.
+     * It will check for day deadlines and assign emotions to current one or throw exception.
+     *
+     * @param userId       Owner of prediction UUID.
+     * @param predictionId Prediction UUID to generate results from.
+     */
     @Override
     public void setPredictionDayEmotions(UUID userId, UUID predictionId, Set<Emotion> emotions) {
         setPredictionDayEmotionsAdapter.setPredictionDayEmotions(userId, predictionId, emotions);
