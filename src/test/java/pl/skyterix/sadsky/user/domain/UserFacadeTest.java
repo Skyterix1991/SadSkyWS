@@ -63,9 +63,9 @@ class UserFacadeTest {
         userDTO.setFirstName("Jan");
         userDTO.setLastName("Kowalski");
         userDTO.setBirthDay(LocalDate.of(2000, 5, 20));
-        userDTO.setWakeHour((short) 7);
         userDTO.setEmail("Test@Test.pl");
         userDTO.setPassword("Test");
+        userDTO.setWakeHour(User.DEFAULT_WAKE_HOUR);
         userDTO.setGroup(new AdminGroup());
 
         user = jpaModelMapper.mapEntity(userDTO, User.class);

@@ -8,8 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
+import pl.skyterix.sadsky.prediction.domain.day.domain.dto.DayDTO;
+import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.dto.MiniUserDTO;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
@@ -18,8 +22,13 @@ import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 public class UserFacade implements UserFacadePort, CommandLineRunner {
@@ -189,9 +198,39 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         adminUser.setLastName("Kowalski");
         adminUser.setBirthDay(LocalDate.now().minusYears(16));
         adminUser.setEmail("admin@admin.pl");
-        adminUser.setPassword("admin");
+        adminUser.setEncryptedPassword(new BCryptPasswordEncoder().encode("admin"));
         adminUser.setGroup(new AdminGroup());
+        adminUser.setWakeHour(12);
 
-        createUser(adminUser);
+        PredictionDTO predictionDTO = new PredictionDTO();
+        predictionDTO.setOwner(adminUser);
+
+        // Generate fully filled days
+        List<DayDTO> days = IntStream.range(1, 8)
+                .mapToObj(dayNumber -> {
+                    DayDTO dayDTO = new DayDTO();
+                    dayDTO.setDayNumber(dayNumber);
+
+                    return dayDTO;
+                })
+                .peek(day -> {
+                    Set<Emotion> emotions = new HashSet<>();
+                    emotions.add(Emotion.ACTIVE);
+                    emotions.add(Emotion.DISHEARTENED);
+                    emotions.add(Emotion.HELPLESS);
+                    emotions.add(Emotion.HOLLOW);
+                    emotions.add(Emotion.BRUNT);
+                    emotions.add(Emotion.LONELY);
+
+                    day.setMorningEmotions(emotions);
+                    day.setAfternoonEmotions(emotions);
+                    day.setEveningEmotions(emotions);
+                }).collect(Collectors.toList());
+
+        predictionDTO.setDays(days);
+
+        adminUser.setPredictions(Collections.singletonList(predictionDTO));
+
+        userRepository.save(jpaModelMapper.mapEntity(adminUser, User.class));
     }
 }

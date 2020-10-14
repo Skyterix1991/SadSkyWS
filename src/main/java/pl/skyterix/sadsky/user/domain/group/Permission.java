@@ -19,5 +19,8 @@ public enum Permission implements Permissions {
 
     // Prediction permissions
     GET_USER_PREDICTIONS,
-    GET_USER_PREDICTION
+    GET_USER_PREDICTION,
+
+    GENERATE_PREDICTION_RESULT,
+    SET_PREDICTION_DAY_EMOTIONS
 }

@@ -36,12 +36,14 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcCo
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .headers().disable()
                 .cors()
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, SecurityConstants.LOGIN_URI).permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.REGISTER_URI).permitAll()
+                .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
                 .addFilter(authenticationFilter())

@@ -22,7 +22,7 @@ public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse
 
     private LocalDate birthDay;
 
-    private Short wakeHour;
+    private Integer wakeHour;
 
     private String email;
 

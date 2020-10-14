@@ -4,15 +4,14 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
+import pl.skyterix.sadsky.prediction.domain.Prediction;
 import pl.skyterix.sadsky.user.domain.group.Permission;
 import pl.skyterix.sadsky.user.domain.group.Permissions;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import pl.skyterix.sadsky.user.domain.group.strategy.UserGroup;
-import pl.skyterix.sadsky.user.domain.prediction.domain.Prediction;
 import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 
 import javax.persistence.CascadeType;
@@ -26,13 +25,15 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
-@NoArgsConstructor
 public class User {
+
+    public final static int DEFAULT_WAKE_HOUR = 7;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -50,16 +51,16 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<Prediction> predictions;
+    private List<Prediction> predictions;
 
     @Column(nullable = false)
     private LocalDate birthDay;
 
     @Column(nullable = false)
-    private short wakeHour;
+    private int wakeHour;
 
     @Column(nullable = false)
     @SortBlacklisted
@@ -85,16 +86,19 @@ public class User {
     @EqualsAndHashCode.Exclude
     private LocalDateTime updateDate;
 
+    public User() {
+        this.group = new UserGroup();
+        this.predictions = new ArrayList<>();
+
+        this.wakeHour = DEFAULT_WAKE_HOUR;
+    }
+
     @PrePersist
     protected void onCreate() {
-        if (group == null) group = new UserGroup();
-
         this.userId = UUID.randomUUID();
+
         this.createDate = LocalDateTime.now();
         this.lastTokenRevokeDate = LocalDateTime.now();
-
-        // Default wake hour is 7 in 24 h cycle.
-        this.wakeHour = 7;
     }
 
     @PreUpdate
