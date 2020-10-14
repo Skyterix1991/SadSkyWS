@@ -120,10 +120,6 @@ public class Day {
         // LocalDateTime list with deadlines for emotions fill
         List<LocalDateTime> deadlines = getDeadlines(prediction);
 
-        // Is it outside of any deadline
-        if (isInDeadline(deadlines.get(3), deadlines.get(0)))
-            throw new DayDeadlineException(Errors.DAY_DEADLINE_EXCEPTION.getErrorMessage());
-
         // Morning emotions
         if (isInDeadline(deadlines.get(0), deadlines.get(1))) {
             this.setMorningEmotions(emotions);
@@ -133,6 +129,9 @@ public class Day {
             // Evening emotions
         } else if (isInDeadline(deadlines.get(2), deadlines.get(3))) {
             this.setEveningEmotions(emotions);
+            // Is it outside of any deadline
+        } else {
+            throw new DayDeadlineException(Errors.DAY_DEADLINE_EXCEPTION.getErrorMessage());
         }
     }
 

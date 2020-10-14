@@ -6,7 +6,7 @@ import lombok.ToString;
 import org.springframework.hateoas.RepresentationModel;
 import pl.skyterix.sadsky.prediction.domain.AnxietyResult;
 import pl.skyterix.sadsky.prediction.domain.DepressionResult;
-import pl.skyterix.sadsky.prediction.domain.day.domain.dto.DayDTO;
+import pl.skyterix.sadsky.prediction.domain.day.response.DayDetailsResponse;
 import pl.skyterix.sadsky.user.response.UserDetailsResponse;
 
 import java.io.Serializable;
@@ -27,7 +27,7 @@ public class PredictionDetailsResponse extends RepresentationModel<PredictionDet
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<DayDTO> days;
+    private List<DayDetailsResponse> days;
 
     private DepressionResult depressionResult;
 

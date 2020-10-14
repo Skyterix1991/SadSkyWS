@@ -33,7 +33,7 @@ import java.util.UUID;
 @Data
 public class User {
 
-    private final static int DEFAULT_WAKE_HOUR = 7;
+    public final static int DEFAULT_WAKE_HOUR = 7;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

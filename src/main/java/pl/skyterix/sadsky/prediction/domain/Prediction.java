@@ -121,7 +121,7 @@ public class Prediction {
 
                     // Is prediction expired
                     if (currentDayNumber > EXPIRE_DAYS)
-                        throw new PredictionIsExpiredException(Errors.PREDICTION_IS_EXPIRED.getErrorMessage());
+                        throw new PredictionIsExpiredException(Errors.PREDICTION_IS_EXPIRED.getErrorMessage(this.predictionId));
 
                     return day.getDayNumber() == currentDayNumber;
                 })

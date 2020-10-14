@@ -6,24 +6,36 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import pl.skyterix.sadsky.exception.DayDeadlineException;
+import pl.skyterix.sadsky.exception.PredictionIsExpiredException;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
+import pl.skyterix.sadsky.prediction.domain.day.domain.dto.DayDTO;
 import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.UserRepository;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
+import static pl.skyterix.sadsky.prediction.domain.Prediction.EXPIRE_DAYS;
 
 @SpringBootTest
 class PredictionFacadeTest {
@@ -47,10 +59,18 @@ class PredictionFacadeTest {
     void beforeEach() {
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail("dsadsa@dsadas.pl");
+        userDTO.setWakeHour(LocalDateTime.now().getHour());
+
+        List<DayDTO> days = IntStream.range(1, EXPIRE_DAYS + 1)
+                .mapToObj(Day::new)
+                .map(day -> jpaModelMapper.mapEntity(day, DayDTO.class))
+                .collect(Collectors.toList());
 
         predictionDTO = new PredictionDTO();
         predictionDTO.setPredictionId(UUID.randomUUID());
         predictionDTO.setOwner(userDTO);
+        predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS));
+        predictionDTO.setDays(days);
 
         prediction = jpaModelMapper.mapEntity(predictionDTO, Prediction.class);
     }
@@ -157,4 +177,61 @@ class PredictionFacadeTest {
         assertThrows(RecordNotFoundException.class, () -> predictionFacade.getMiniUserPrediction(UUID.randomUUID(), UUID.randomUUID()), "Exception was not thrown.");
     }
 
+    @Test
+    void generatePredictionResult() {
+    }
+
+    @Test
+    @DisplayName("Set prediction day emotions")
+    void givenUserIdAndPredictionId_whenSetPredictionDayEmotions_thenRunSuccessfully() {
+        // Given
+        // When
+        when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
+                .thenReturn(Optional.of(prediction));
+        // Then
+        assertDoesNotThrow(() ->
+                        predictionFacade.setPredictionDayEmotions(UUID.randomUUID(), UUID.randomUUID(), Collections.singleton(Emotion.ACTIVE)),
+                "Exception was thrown");
+    }
+
+    @Test
+    @DisplayName("Set expired prediction day emotions")
+    void givenUserIdAndExpiredPredictionId_whenSetPredictionDayEmotions_thenThrowPredictionExpiredException() {
+        // Given
+        prediction.setExpireDate(LocalDate.now());
+        // When
+        when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
+                .thenReturn(Optional.of(prediction));
+        // Then
+        assertThrows(PredictionIsExpiredException.class, () ->
+                        predictionFacade.setPredictionDayEmotions(UUID.randomUUID(), UUID.randomUUID(), Collections.singleton(Emotion.ACTIVE)),
+                "Exception was not thrown");
+    }
+
+    @Test
+    @DisplayName("Set prediction day emotions by non existing prediction UUID")
+    void givenUserIdAndNonExistingPredictionId_whenSetPredictionDayEmotions_thenThrowRecordNotFoundException() {
+        // Given
+        // When
+        when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
+                .thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () ->
+                        predictionFacade.setPredictionDayEmotions(UUID.randomUUID(), UUID.randomUUID(), Collections.singleton(Emotion.ACTIVE)),
+                "Exception was not thrown");
+    }
+
+    @Test
+    @DisplayName("Set prediction day emotions outside of any deadline")
+    void givenUserIdAndPredictionIdOutsideOfAnyDeadlines_whenSetPredictionDayEmotions_thenThrowDayDeadlineException() {
+        // Given
+        prediction.getOwner().setWakeHour(LocalDateTime.now().getHour() + 1);
+        // When
+        when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
+                .thenReturn(Optional.of(prediction));
+        // Then
+        assertThrows(DayDeadlineException.class, () ->
+                        predictionFacade.setPredictionDayEmotions(UUID.randomUUID(), UUID.randomUUID(), Collections.singleton(Emotion.ACTIVE)),
+                "Exception was not thrown");
+    }
 }
