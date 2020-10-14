@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ class CommandPredictionController implements CommandPredictionControllerPort {
     @Override
     @PutMapping("/{predictionId}/days/current/emotions")
     @ResponseStatus(HttpStatus.CREATED)
-    public void setPredictionDayEmotions(@PathVariable UUID userId, @PathVariable UUID predictionId, @Validated DayEmotionsRequest dayEmotionsRequest) {
+    public void setPredictionDayEmotions(@PathVariable UUID userId, @PathVariable UUID predictionId, @RequestBody @Validated DayEmotionsRequest dayEmotionsRequest) {
         predictionFacade.setPredictionDayEmotions(userId, predictionId, dayEmotionsRequest.getEmotions());
     }
 

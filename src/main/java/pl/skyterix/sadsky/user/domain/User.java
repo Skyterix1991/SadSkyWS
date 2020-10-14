@@ -4,7 +4,6 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 import pl.skyterix.sadsky.prediction.domain.Prediction;
@@ -32,8 +31,9 @@ import java.util.UUID;
 
 @Entity
 @Data
-@NoArgsConstructor
 public class User {
+
+    private final static int DEFAULT_WAKE_HOUR = 7;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -60,7 +60,7 @@ public class User {
     private LocalDate birthDay;
 
     @Column(nullable = false)
-    private short wakeHour;
+    private int wakeHour;
 
     @Column(nullable = false)
     @SortBlacklisted
@@ -86,6 +86,10 @@ public class User {
     @EqualsAndHashCode.Exclude
     private LocalDateTime updateDate;
 
+    public User() {
+        this.wakeHour = DEFAULT_WAKE_HOUR;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (group == null) group = new UserGroup();
@@ -94,9 +98,6 @@ public class User {
         this.userId = UUID.randomUUID();
         this.createDate = LocalDateTime.now();
         this.lastTokenRevokeDate = LocalDateTime.now();
-
-        // Default wake hour is 7 in 24 h cycle.
-        this.wakeHour = 7;
     }
 
     @PreUpdate

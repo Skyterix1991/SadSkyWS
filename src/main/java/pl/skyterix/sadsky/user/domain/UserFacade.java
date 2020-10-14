@@ -200,6 +200,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         adminUser.setEmail("admin@admin.pl");
         adminUser.setEncryptedPassword(new BCryptPasswordEncoder().encode("admin"));
         adminUser.setGroup(new AdminGroup());
+        adminUser.setWakeHour(12);
 
         PredictionDTO predictionDTO = new PredictionDTO();
         predictionDTO.setOwner(adminUser);

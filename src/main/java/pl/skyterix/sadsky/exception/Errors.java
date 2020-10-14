@@ -21,7 +21,7 @@ public enum Errors {
     PREDICTION_RESULT_NOT_READY_TO_GENERATE("Prediction result is not ready to generate."),
     PREDICTION_RESULT_IS_ALREADY_GENERATED("Prediction result was already generated."),
     PREDICTION_IS_EXPIRED("Prediction {0} is expired."),
-    DAY_DEADLINE_EXCEPTION("Prediction {0} day deadline is reached. Cannot set emotions.");
+    DAY_DEADLINE_EXCEPTION("Prediction day deadline is reached. Cannot set emotions.");
 
     private final String errorMessage;
 

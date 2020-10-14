@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
 @Data
 public class Prediction {
 
-    private final static short EXPIRE_DAYS = 7;
+    public final static short EXPIRE_DAYS = 7;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

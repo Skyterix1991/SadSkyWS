@@ -63,7 +63,6 @@ class UserFacadeTest {
         userDTO.setFirstName("Jan");
         userDTO.setLastName("Kowalski");
         userDTO.setBirthDay(LocalDate.of(2000, 5, 20));
-        userDTO.setWakeHour((short) 7);
         userDTO.setEmail("Test@Test.pl");
         userDTO.setPassword("Test");
         userDTO.setGroup(new AdminGroup());

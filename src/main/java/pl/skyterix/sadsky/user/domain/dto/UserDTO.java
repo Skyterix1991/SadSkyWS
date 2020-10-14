@@ -22,7 +22,7 @@ public class UserDTO {
 
     private LocalDate birthDay;
 
-    private Short wakeHour;
+    private Integer wakeHour;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
