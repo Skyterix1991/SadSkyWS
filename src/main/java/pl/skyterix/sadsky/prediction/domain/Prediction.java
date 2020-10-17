@@ -28,7 +28,6 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,8 +92,6 @@ public class Prediction {
 
         // Assign expire days in case of change of constant
         this.setExpireDays(EXPIRE_DAYS);
-
-        this.days = new ArrayList<>();
     }
 
     @PrePersist
