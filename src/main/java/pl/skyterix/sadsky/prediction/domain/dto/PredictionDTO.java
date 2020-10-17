@@ -28,6 +28,8 @@ public class PredictionDTO {
 
     private AnxietyResult anxietyResult;
 
+    private Integer expireDays;
+
     private LocalDate expireDate;
 
     @ToString.Exclude

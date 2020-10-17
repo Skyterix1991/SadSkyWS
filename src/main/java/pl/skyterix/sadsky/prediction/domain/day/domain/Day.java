@@ -139,7 +139,7 @@ public class Day {
         LocalDateTime currentTime = LocalDateTime.now();
 
         // Is current time between start and end.
-        return (currentTime.isEqual(start) || currentTime.isAfter(start) && currentTime.isBefore(end));
+        return currentTime.isEqual(start) || currentTime.isAfter(start) && currentTime.isBefore(end);
     }
 
     private List<LocalDateTime> getDeadlines(Prediction prediction) {

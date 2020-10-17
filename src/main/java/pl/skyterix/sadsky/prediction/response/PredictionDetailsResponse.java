@@ -29,6 +29,8 @@ public class PredictionDetailsResponse extends RepresentationModel<PredictionDet
     @EqualsAndHashCode.Exclude
     private List<DayDetailsResponse> days;
 
+    private int expireDays;
+
     private DepressionResult depressionResult;
 
     private AnxietyResult anxietyResult;
