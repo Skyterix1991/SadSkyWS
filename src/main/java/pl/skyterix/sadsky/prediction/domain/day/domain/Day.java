@@ -146,9 +146,9 @@ public class Day {
         return IntStream.range(0, 4)
                 .mapToObj(i -> {
                     // Create date time from expire date and subtract number of passed days.
-                    LocalDateTime currentTime = prediction.getExpireDate().atStartOfDay().minusDays(Prediction.EXPIRE_DAYS - this.dayNumber + 1);
+                    LocalDateTime deadlineTime = prediction.getExpireDate().atStartOfDay().minusDays(Prediction.EXPIRE_DAYS - this.dayNumber + 1);
                     // Calculate deadline for current i.
-                    return currentTime.plusHours(prediction.getOwner().getWakeHour() + Day.DAY_PART_HOURS * i);
+                    return deadlineTime.plusHours(prediction.getOwner().getWakeHour() + Day.DAY_PART_HOURS * i);
                 }).collect(Collectors.toUnmodifiableList());
     }
 }
