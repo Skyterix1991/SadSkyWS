@@ -8,6 +8,7 @@ import pl.skyterix.sadsky.prediction.domain.Prediction;
 import pl.skyterix.sadsky.prediction.domain.PredictionFacade;
 import pl.skyterix.sadsky.prediction.domain.PredictionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -19,7 +20,7 @@ class PredictionExpireTask {
 
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void generateExpiredPredictionsResults() {
-        List<Prediction> expiredPredictions = predictionRepository.findAllExpired();
+        List<Prediction> expiredPredictions = predictionRepository.findAllExpired(LocalDateTime.now());
         // Automatically generate results for expired predictions.
         expiredPredictions.forEach(prediction ->
                 predictionFacade.generatePredictionResult(prediction.getOwner().getUserId(), prediction.getPredictionId()));

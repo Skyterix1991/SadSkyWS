@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +27,6 @@ public interface PredictionRepository extends JpaRepository<Prediction, Long> {
 
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
 
-    @Query("from Prediction where expireDate > current_date and depressionResult is null")
-    List<Prediction> findAllExpired();
+    @Query("from Prediction where expireDate > ?1 and depressionResult is null")
+    List<Prediction> findAllExpired(LocalDateTime now);
 }
