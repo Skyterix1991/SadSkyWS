@@ -62,7 +62,11 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         predictionRepositoryAdapter.updatePrediction(prediction);
 
         // Create new prediction
-        user.getPredictions().add(new Prediction());
+        Prediction newPrediction = new Prediction();
+        newPrediction.setOwner(user);
+        newPrediction = predictionRepositoryAdapter.createPrediction(newPrediction);
+
+        user.getPredictions().add(newPrediction);
 
         userRepository.save(user);
     }
