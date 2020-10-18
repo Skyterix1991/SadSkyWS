@@ -22,7 +22,7 @@ public interface PredictionRepository extends JpaRepository<Prediction, Long> {
 
     void deleteByPredictionId(UUID predictionId);
 
-    @Query("from Prediction p where p.owner.userId = ?1 order by p.createDate desc")
+    @Query("from Prediction p where p.owner.userId = ?1 order by p.createDate asc")
     Set<Prediction> findAllByUserId(UUID userId);
 
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
