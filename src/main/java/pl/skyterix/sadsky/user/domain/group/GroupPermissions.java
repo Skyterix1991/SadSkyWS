@@ -13,6 +13,10 @@ import static pl.skyterix.sadsky.user.domain.group.SelfPermission.REPLACE_SELF_U
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.SET_SELF_PREDICTION_DAY_EMOTIONS;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.UPDATE_SELF_USER;
 
+/**
+ * Permissions for each of groups.
+ * You can add permissions from Permission class and SelfPermission class.
+ */
 public class GroupPermissions {
 
     public static final List<Permissions> USER_PERMISSIONS = Arrays.asList(
@@ -29,6 +33,9 @@ public class GroupPermissions {
             SET_SELF_PREDICTION_DAY_EMOTIONS
     );
 
+    /**
+     * Contains all available permissions.
+     */
     public static final List<Permissions> ADMIN_PERMISSIONS = Arrays.asList(Stream.of(Permission.values(), SelfPermission.values()).flatMap(Stream::of)
             .toArray(Permissions[]::new));
 }

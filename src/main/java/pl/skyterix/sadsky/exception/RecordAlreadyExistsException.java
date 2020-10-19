@@ -1,10 +1,12 @@
 package pl.skyterix.sadsky.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class RecordAlreadyExistsException extends RuntimeException {
+public class RecordAlreadyExistsException extends RuntimeException implements RestException {
+
+    @Getter
+    private final HttpStatus status = HttpStatus.CONFLICT;
 
     public RecordAlreadyExistsException(String message) {
         super(message);

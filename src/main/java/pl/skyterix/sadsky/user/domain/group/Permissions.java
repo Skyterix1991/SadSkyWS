@@ -1,4 +1,4 @@
 package pl.skyterix.sadsky.user.domain.group;
 
-public interface Permissions {
+public sealed interface Permissions permits Permission, SelfPermission {
 }

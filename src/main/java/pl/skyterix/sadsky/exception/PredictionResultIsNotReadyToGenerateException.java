@@ -1,10 +1,12 @@
 package pl.skyterix.sadsky.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-public class PredictionResultIsNotReadyToGenerateException extends RuntimeException {
+public class PredictionResultIsNotReadyToGenerateException extends RuntimeException implements RestException {
+
+    @Getter
+    private final HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
 
     public PredictionResultIsNotReadyToGenerateException(String message) {
         super(message);
