@@ -45,15 +45,15 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
             throw new PredictionResultIsNotReadyToGenerateException(Errors.PREDICTION_RESULT_NOT_READY_TO_GENERATE.getErrorMessage());
 
         // Count positive and negative points from emotions for each day and sum them
-        int positiveDepressionPoints = countPoints(prediction, day -> day.countPoints(Emotion::getDepressionPositivePoints));
-        int negativeDepressionPoints = countPoints(prediction, day -> day.countPoints(Emotion::getDepressionNegativePoints));
+        int depressionPointsRatio = countPointsRatio(prediction, day -> day.countPointsRatio(Emotion::getDepressionPoints));
+        int anxietyPointsRatio = countPointsRatio(prediction, day -> day.countPointsRatio(Emotion::getAnxietyPoints));
 
-        int positiveAnxietyPoints = countPoints(prediction, day -> day.countPoints(Emotion::getAnxietyPositivePoints));
-        int negativeAnxietyPoints = countPoints(prediction, day -> day.countPoints(Emotion::getAnxietyNegativePoints));
+        // Count filled day parts count
+        int totalAnswers = countFilledDayParts(prediction, Day::countFilledDayParts);
 
         // Run knn
-        DepressionResult depressionResult = generateDepressionResult(positiveDepressionPoints, negativeDepressionPoints);
-        AnxietyResult anxietyResult = generateAnxietyResult(positiveAnxietyPoints, negativeAnxietyPoints);
+        DepressionResult depressionResult = generateDepressionResult(depressionPointsRatio, totalAnswers);
+        AnxietyResult anxietyResult = generateAnxietyResult(anxietyPointsRatio, totalAnswers);
 
         // Save prediction results
         prediction.setDepressionResult(depressionResult);
@@ -72,7 +72,7 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
     }
 
     @SneakyThrows
-    private Instances runKnnOnDataset(String datasetPath, int positiveScore, int negativeScore) {
+    private Instances runKnnOnDataset(String datasetPath, int scoreRatio, int totalAnswers) {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(datasetPath);
 
         assert inputStream != null;
@@ -87,17 +87,17 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         k = (k % 2 == 0) ? k + 1 : k;
 
         Instance toPredictInstance = new DenseInstance(2);
-        toPredictInstance.setValue(0, positiveScore); // Positive score
-        toPredictInstance.setValue(1, negativeScore); // Negative score
+        toPredictInstance.setValue(0, scoreRatio); // Score ratio
+        toPredictInstance.setValue(1, totalAnswers); // Total answers
 
         return knn.kNearestNeighbours(toPredictInstance, k);
     }
 
-    private AnxietyResult generateAnxietyResult(int positiveAnxietyScore, int negativeAnxietyScore) {
+    private AnxietyResult generateAnxietyResult(int anxietyScoreRatio, int totalAnswers) {
         Instances nearestInstances = runKnnOnDataset(
                 ANXIETY_DATASET_PATH,
-                positiveAnxietyScore,
-                negativeAnxietyScore
+                anxietyScoreRatio,
+                totalAnswers
         );
 
         long severePredictions = nearestInstances.stream()
@@ -110,22 +110,24 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 .filter(predicate -> predicate.equals("MILD_ANXIETY"))
                 .count();
 
+        long negativePredictions = nearestInstances.numInstances() - severePredictions - mildPredictions;
+
         // If number of severe predictions is higher than mild predictions and higher than negative predictions
-        if (severePredictions > mildPredictions && severePredictions > nearestInstances.numInstances())
+        if (severePredictions > mildPredictions && severePredictions > negativePredictions)
             return AnxietyResult.SEVERE_ANXIETY;
             // If number of mild predictions is higher than severe predictions and higher than negative predictions
-        else if (mildPredictions > severePredictions && mildPredictions > nearestInstances.numInstances())
+        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions)
             return AnxietyResult.MILD_ANXIETY;
         else
             return AnxietyResult.NEGATIVE;
     }
 
-    private DepressionResult generateDepressionResult(int positiveDepressionScore, int negativeDepressionScore) {
+    private DepressionResult generateDepressionResult(int depressionScoreRatio, int totalAnswers) {
         // Run knn on depression dataset
         Instances nearestInstances = runKnnOnDataset(
                 DEPRESSION_DATASET_PATH,
-                positiveDepressionScore,
-                negativeDepressionScore
+                depressionScoreRatio,
+                totalAnswers
         );
 
         long severePredictions = nearestInstances.stream()
@@ -138,17 +140,26 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
                 .filter(predicate -> predicate.equals("MILD_DEPRESSION"))
                 .count();
 
+        long negativePredictions = nearestInstances.numInstances() - severePredictions - mildPredictions;
+
         // If number of severe predictions is higher than mild predictions and higher than negative predictions
-        if (severePredictions > mildPredictions && severePredictions > nearestInstances.numInstances())
+        if (severePredictions > mildPredictions && severePredictions > negativePredictions)
             return DepressionResult.SEVERE_DEPRESSION;
             // If number of mild predictions is higher than severe predictions and higher than negative predictions
-        else if (mildPredictions > severePredictions && mildPredictions > nearestInstances.numInstances())
+        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions)
             return DepressionResult.MILD_DEPRESSION;
         else
             return DepressionResult.NEGATIVE;
     }
 
-    private int countPoints(Prediction prediction, ToIntFunction<Day> toIntFunction) {
+    private int countPointsRatio(Prediction prediction, ToIntFunction<Day> toIntFunction) {
+        // Run toIntFunction interface on each day and sum the results
+        return prediction.getDays().stream()
+                .mapToInt(toIntFunction)
+                .sum();
+    }
+
+    private int countFilledDayParts(Prediction prediction, ToIntFunction<Day> toIntFunction) {
         // Run toIntFunction interface on each day and sum the results
         return prediction.getDays().stream()
                 .mapToInt(toIntFunction)

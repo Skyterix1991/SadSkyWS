@@ -144,7 +144,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>delombok</goal>
                         </goals>
@@ -186,7 +186,6 @@
                 <configuration>
                     <source>15</source>
                     <target>15</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

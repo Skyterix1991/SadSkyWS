@@ -94,7 +94,28 @@ public class Day {
         this.updateDate = LocalDateTime.now();
     }
 
-    public int countPoints(ToIntFunction<Emotion> toIntFunction) {
+    /**
+     * Return amount between 0 and 3 for each filled day part (morning, afternoon, evening) add 1.
+     *
+     * @return Filled day parts count.
+     */
+    public int countFilledDayParts() {
+        int count = 0;
+
+        if (morningEmotions != null && !morningEmotions.isEmpty()) count++;
+        if (afternoonEmotions != null && !afternoonEmotions.isEmpty()) count++;
+        if (eveningEmotions != null && !eveningEmotions.isEmpty()) count++;
+
+        return count;
+    }
+
+    /**
+     * Run function on each emotion in day morning, afternoon and evening arrays.
+     *
+     * @param toIntFunction Function from Emotion class.
+     * @return Positive and negative points ratio.
+     */
+    public int countPointsRatio(ToIntFunction<Emotion> toIntFunction) {
         int morningPoints = this.getMorningEmotions().stream()
                 .mapToInt(toIntFunction)
                 .sum();

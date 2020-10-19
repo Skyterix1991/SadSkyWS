@@ -56,24 +56,4 @@ public enum Emotion {
         this.depressionPoints = depressionPoints;
         this.anxietyPoints = anxietyPoints;
     }
-
-    public int getDepressionPositivePoints() {
-        // Return only if points are positive if not return neutral 0
-        return (depressionPoints > 0) ? depressionPoints : 0;
-    }
-
-    public int getDepressionNegativePoints() {
-        // Return only if points are negative if not return neutral 0
-        return (depressionPoints < 0) ? depressionPoints : 0;
-    }
-
-    public int getAnxietyPositivePoints() {
-        // Return only if points are positive if not return neutral 0
-        return (anxietyPoints > 0) ? anxietyPoints : 0;
-    }
-
-    public int getAnxietyNegativePoints() {
-        // Return only if points are negative if not return neutral 0
-        return (anxietyPoints < 0) ? anxietyPoints : 0;
-    }
 }
