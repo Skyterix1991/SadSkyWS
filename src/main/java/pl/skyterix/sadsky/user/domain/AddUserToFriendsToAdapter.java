@@ -2,6 +2,7 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
+import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 
@@ -22,6 +23,9 @@ class AddUserToFriendsToAdapter implements AddUserToFriendsToPort {
 
         if (friend.getFriendPendingInvites().contains(user))
             throw new RecordNotFoundException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(friendId));
+
+        if (user.getFriendSentInvites().contains(friend))
+            throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(friendId));
 
         // Send invites
         user.getFriendSentInvites().add(friend);
