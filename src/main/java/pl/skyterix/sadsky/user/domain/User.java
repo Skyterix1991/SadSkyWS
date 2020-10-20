@@ -20,6 +20,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -51,7 +54,50 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "friend_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @SortBlacklisted
+    private List<User> friends;
+
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_friend_pending_invites",
+            joinColumns = @JoinColumn(name = "friend_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @SortBlacklisted
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<User> friendPendingInvites;
+
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_friends_to",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    @SortBlacklisted
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<User> friendsTo;
+
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_friend_sent_invites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    @SortBlacklisted
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<User> friendSentInvites;
+
     @OneToMany(cascade = CascadeType.ALL)
+    @SortBlacklisted
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Prediction> predictions;
@@ -89,6 +135,10 @@ public class User {
     public User() {
         this.group = new UserGroup();
         this.predictions = new ArrayList<>();
+        this.friends = new ArrayList<>();
+        this.friendsTo = new ArrayList<>();
+        this.friendPendingInvites = new ArrayList<>();
+        this.friendSentInvites = new ArrayList<>();
 
         this.wakeHour = DEFAULT_WAKE_HOUR;
     }

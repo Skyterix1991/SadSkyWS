@@ -24,7 +24,8 @@ public enum Errors {
     PREDICTION_IS_EXPIRED("Wynik [uuid={0}] wygasł."),
     DAY_DEADLINE_EXCEPTION("Ostatni termin zmiany emocji na dzisiaj wygasł. Nie można ustawić emocji."),
     BAD_REQUEST("Przekazane wartości są niepoprawne."),
-    UNIDENTIFIED("Wystąpił nieokreślony błąd.");
+    UNIDENTIFIED("Wystąpił nieokreślony błąd."),
+    TARGET_RECORD_IS_THE_SAME_AS_SOURCE("Docelowy rekord jest ten sam to źródłowy.");
 
     private final String errorMessage;
 

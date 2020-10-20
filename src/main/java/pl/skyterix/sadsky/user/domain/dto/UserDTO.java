@@ -38,6 +38,22 @@ public class UserDTO {
 
     private GroupStrategy group;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<UserDTO> friends;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<UserDTO> friendPendingInvites;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<UserDTO> friendsTo;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<UserDTO> friendSentInvites;
+
     private LocalDateTime lastTokenRevokeDate;
 
     private LocalDateTime createDate;
