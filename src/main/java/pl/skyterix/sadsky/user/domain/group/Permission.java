@@ -1,5 +1,8 @@
 package pl.skyterix.sadsky.user.domain.group;
 
+/**
+ * Permissions to use on any other user.
+ */
 public enum Permission implements Permissions {
     // User permissions
     GET_FULL_USER,

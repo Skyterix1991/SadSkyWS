@@ -94,7 +94,28 @@ public class Day {
         this.updateDate = LocalDateTime.now();
     }
 
-    public int countPoints(ToIntFunction<Emotion> toIntFunction) {
+    /**
+     * Return amount between 0 and 3 for each filled day part (morning, afternoon, evening) add 1.
+     *
+     * @return Filled day parts count.
+     */
+    public int countFilledDayParts() {
+        int count = 0;
+
+        if (morningEmotions != null && !morningEmotions.isEmpty()) count++;
+        if (afternoonEmotions != null && !afternoonEmotions.isEmpty()) count++;
+        if (eveningEmotions != null && !eveningEmotions.isEmpty()) count++;
+
+        return count;
+    }
+
+    /**
+     * Run function on each emotion in day morning, afternoon and evening arrays.
+     *
+     * @param toIntFunction Function from Emotion class.
+     * @return Positive and negative points ratio.
+     */
+    public int countPointsRatio(ToIntFunction<Emotion> toIntFunction) {
         int morningPoints = this.getMorningEmotions().stream()
                 .mapToInt(toIntFunction)
                 .sum();
@@ -139,16 +160,16 @@ public class Day {
         LocalDateTime currentTime = LocalDateTime.now();
 
         // Is current time between start and end.
-        return (currentTime.isEqual(start) || currentTime.isAfter(start) && currentTime.isBefore(end));
+        return currentTime.isEqual(start) || currentTime.isAfter(start) && currentTime.isBefore(end);
     }
 
     private List<LocalDateTime> getDeadlines(Prediction prediction) {
         return IntStream.range(0, 4)
                 .mapToObj(i -> {
                     // Create date time from expire date and subtract number of passed days.
-                    LocalDateTime currentTime = prediction.getExpireDate().atStartOfDay().minusDays(Prediction.EXPIRE_DAYS - this.dayNumber + 1);
+                    LocalDateTime deadlineTime = prediction.getExpireDate().atStartOfDay().minusDays(Prediction.EXPIRE_DAYS - this.dayNumber + 1);
                     // Calculate deadline for current i.
-                    return currentTime.plusHours(prediction.getOwner().getWakeHour() + Day.DAY_PART_HOURS * i);
+                    return deadlineTime.plusHours(prediction.getOwner().getWakeHour() + Day.DAY_PART_HOURS * i);
                 }).collect(Collectors.toUnmodifiableList());
     }
 }

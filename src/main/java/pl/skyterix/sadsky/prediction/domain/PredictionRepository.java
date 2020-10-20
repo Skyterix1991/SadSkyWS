@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,11 +22,11 @@ public interface PredictionRepository extends JpaRepository<Prediction, Long> {
 
     void deleteByPredictionId(UUID predictionId);
 
-    @Query("from Prediction p where p.owner.userId = ?1 order by p.createDate desc")
+    @Query("from Prediction p where p.owner.userId = ?1 order by p.createDate asc")
     Set<Prediction> findAllByUserId(UUID userId);
 
     Optional<Prediction> findPredictionByPredictionId(UUID predictionId);
 
-    @Query("from Prediction where expireDate > current_date and depressionResult is null")
-    List<Prediction> findAllExpired();
+    @Query("from Prediction where expireDate > ?1 and depressionResult is null")
+    List<Prediction> findAllExpired(LocalDateTime now);
 }

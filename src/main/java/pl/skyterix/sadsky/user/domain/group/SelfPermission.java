@@ -1,5 +1,8 @@
 package pl.skyterix.sadsky.user.domain.group;
 
+/**
+ * Permissions to only use on yourself.
+ */
 public enum SelfPermission implements Permissions {
     // User permissions
     GET_FULL_SELF_USER,
