@@ -2,7 +2,8 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
-import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.exception.FriendsCountExceededMaximumException;
+import pl.skyterix.sadsky.exception.RecordNotFoundInCollectionException;
 import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 
 import java.util.UUID;
@@ -11,6 +12,8 @@ import java.util.UUID;
 class AcceptUserPendingInviteAdapter implements AcceptUserPendingInvitePort {
 
     private final UserRepositoryPort userRepositoryAdapter;
+
+    private final static int MAX_FRIENDS = 50;
 
     @Override
     public void acceptUserPendingInvite(UUID userId, UUID friendId) {
@@ -21,7 +24,11 @@ class AcceptUserPendingInviteAdapter implements AcceptUserPendingInvitePort {
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
         if (!user.getFriendPendingInvites().contains(friend))
-            throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(friendId));
+            throw new RecordNotFoundInCollectionException(Errors.NO_RECORD_FOUND_IN_COLLECTION.getErrorMessage(friendId));
+
+        // Check if current amount of friends invites won't be higher than the limit after this request.
+        if (user.getFriends().size() + 1 > MAX_FRIENDS)
+            throw new FriendsCountExceededMaximumException(Errors.FRIENDS_COUNT_EXCEEDED_MAXIMUM.getErrorMessage(userId));
 
         // Remove invites
         user.getFriendPendingInvites().remove(friend);

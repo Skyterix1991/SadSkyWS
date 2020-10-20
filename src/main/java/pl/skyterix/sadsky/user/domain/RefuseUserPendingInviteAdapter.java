@@ -2,7 +2,7 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
-import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.exception.RecordNotFoundInCollectionException;
 import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 
 import java.util.UUID;
@@ -21,7 +21,7 @@ class RefuseUserPendingInviteAdapter implements RefuseUserPendingInvitePort {
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
         if (!user.getFriendPendingInvites().contains(friend))
-            throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(friendId));
+            throw new RecordNotFoundInCollectionException(Errors.NO_RECORD_FOUND_IN_COLLECTION.getErrorMessage(friendId));
 
         // Remove invites
         user.getFriendPendingInvites().remove(friend);

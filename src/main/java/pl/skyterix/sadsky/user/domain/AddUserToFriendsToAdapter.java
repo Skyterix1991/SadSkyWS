@@ -2,7 +2,9 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
-import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
+import pl.skyterix.sadsky.exception.PendingFriendInvitesExceededMaximumException;
+import pl.skyterix.sadsky.exception.RecordAlreadyExistsInCollectionException;
+import pl.skyterix.sadsky.exception.SentFriendInvitesExceededMaximumException;
 import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 
 import java.util.UUID;
@@ -11,6 +13,9 @@ import java.util.UUID;
 class AddUserToFriendsToAdapter implements AddUserToFriendsToPort {
 
     private final UserRepositoryPort userRepositoryAdapter;
+
+    private final static short MAX_SENT_REQUESTS = 10;
+    private final static short MAX_PENDING_REQUESTS = 10;
 
     @Override
     public void addUserToFriendsTo(UUID userId, UUID friendId) {
@@ -21,7 +26,15 @@ class AddUserToFriendsToAdapter implements AddUserToFriendsToPort {
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
         if (user.getFriendSentInvites().contains(friend))
-            throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(friendId));
+            throw new RecordAlreadyExistsInCollectionException(Errors.RECORD_ALREADY_EXISTS_IN_COLLECTION.getErrorMessage(friendId));
+
+        // Check if current amount of pending invites won't be higher than the limit after this request.
+        if (friend.getFriendPendingInvites().size() + 1 > MAX_PENDING_REQUESTS)
+            throw new PendingFriendInvitesExceededMaximumException(Errors.PENDING_FRIEND_INVITES_EXCEEDED_MAXIMUM.getErrorMessage(friendId));
+
+        // Check if current amount of sent invites won't be higher than the limit after this request.
+        if (user.getFriendSentInvites().size() + 1 > MAX_SENT_REQUESTS)
+            throw new SentFriendInvitesExceededMaximumException(Errors.SENT_FRIEND_INVITES_EXCEEDED_MAXIMUM.getErrorMessage(userId));
 
         // Send invites
         user.getFriendSentInvites().add(friend);

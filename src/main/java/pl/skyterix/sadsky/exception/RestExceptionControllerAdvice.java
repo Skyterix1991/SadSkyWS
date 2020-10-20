@@ -112,6 +112,8 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
             PredictionResultIsNotReadyToGenerateException.class,
             PredictionResultIsAlreadyGeneratedException.class,
             RecordAlreadyExistsException.class,
+            RecordNotFoundInCollectionException.class,
+            RecordAlreadyExistsInCollectionException.class,
             RecordNotFoundException.class
     })
     protected ResponseEntity<Object> handleEntityNotFound(
