@@ -20,7 +20,7 @@ class RemoveUserFromFriendsAdapter implements RemoveUserFromFriendsPort {
         User user = userRepositoryAdapter.findByUserId(userId);
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
-        if (!user.getFriendsTo().contains(friend))
+        if (!user.getFriends().contains(friend))
             throw new RecordNotFoundInCollectionException(Errors.NO_RECORD_FOUND_IN_COLLECTION.getErrorMessage(friendId));
 
         // Remove user from friends to

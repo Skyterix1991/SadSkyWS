@@ -16,17 +16,28 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.skyterix.sadsky.exception.FriendsCountExceededMaximumException;
+import pl.skyterix.sadsky.exception.PendingFriendInvitesExceededMaximumException;
 import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
+import pl.skyterix.sadsky.exception.RecordAlreadyExistsInCollectionException;
 import pl.skyterix.sadsky.exception.RecordNotFoundException;
+import pl.skyterix.sadsky.exception.RecordNotFoundInCollectionException;
+import pl.skyterix.sadsky.exception.SentFriendInvitesExceededMaximumException;
+import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
 import pl.skyterix.sadsky.user.domain.group.strategy.AdminGroup;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
 import javax.annotation.Nullable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -330,5 +341,531 @@ class UserFacadeTest {
         when(userRepository.findUserByUserId(any())).thenReturn(Optional.empty());
         // Then
         assertThrows(RecordNotFoundException.class, () -> userFacade.setUserGroup(UUID.randomUUID(), new AdminGroup()), "Non existing uuid was given but exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Get user mini friends")
+    void getUserMiniFriends() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserFriends(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        List<UserDTO> users = userFacade.getUserMiniFriends(UUID.randomUUID());
+
+        assertNull(users.get(0).getEmail(), "Sensitive data is exposed.");
+    }
+
+    @Test
+    @DisplayName("Get user mini friends to")
+    void givenUserId_getUserMiniFriendsTo() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserFriendsTo(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        List<UserDTO> users = userFacade.getUserMiniFriendsTo(UUID.randomUUID());
+
+        assertNull(users.get(0).getEmail(), "Sensitive data is exposed.");
+    }
+
+    @Test
+    @DisplayName("Get user mini pending invites")
+    void getUserMiniPendingInvites() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserPendingInvites(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        List<UserDTO> users = userFacade.getUserMiniPendingInvites(UUID.randomUUID());
+
+        assertNull(users.get(0).getEmail(), "Sensitive data is exposed.");
+    }
+
+    @Test
+    @DisplayName("Get user mini sent invites")
+    void givenUserId_whenGetUserMiniSentInvites_thenReturnUserMiniSentInvitesWithoutSensitiveData() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserSentInvites(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        List<UserDTO> users = userFacade.getUserMiniSentInvites(UUID.randomUUID());
+
+        assertNull(users.get(0).getEmail(), "Sensitive data is exposed.");
+    }
+
+    @Test
+    @DisplayName("Get user full friends")
+    void givenUserId_whenGetUserFullFriends_thenReturnValidUserFriends() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserFriends(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        assertEquals(Collections.singletonList(userDTO), userFacade.getUserFullFriends(UUID.randomUUID()), "Result is not the same as original.");
+    }
+
+    @Test
+    @DisplayName("Get user full friends to")
+    void givenUserId_whenGetUserFullFriendsTo_thenReturnValidUserFriendsTo() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserFriendsTo(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        assertEquals(Collections.singletonList(userDTO), userFacade.getUserFullFriendsTo(UUID.randomUUID()), "Result is not the same as original.");
+    }
+
+    @Test
+    @DisplayName("Get user full pending invites")
+    void givenUserId_whenGetUserFullPendingInvites_thenReturnValidUserPendingInvites() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserPendingInvites(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        assertEquals(Collections.singletonList(userDTO), userFacade.getUserFullPendingInvites(UUID.randomUUID()), "Result is not the same as original.");
+    }
+
+    @Test
+    @DisplayName("Get user full sent invites")
+    void givenUserId_whenGetUserFullSentInvites_thenReturnValidUserSentInvites() {
+        // Given
+        userDTO.setPassword(null);
+        // When
+        when(userRepository.findAllUserSentInvites(any())).thenReturn(Collections.singletonList(user));
+        // Then
+        assertEquals(Collections.singletonList(userDTO), userFacade.getUserFullSentInvites(UUID.randomUUID()), "Result is not the same as original.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to")
+    void givenUserIdAndFriendId_whenAddUserToFriendsTo_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenAddUserToFriendsTo_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenAddUserToFriendsTo_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.addUserToFriendsTo(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenAddUserToFriendsTo_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with already sent invite")
+    void givenUserIdWithAlreadySentInviteAndFriendId_whenAddUserToFriendsTo_thenThrowRecordAlreadyExistsInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendSentInvites(Collections.singletonList(friend));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordAlreadyExistsInCollectionException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with full sent invites list")
+    void givenUserIdWithFullSentInvitesListAndFriendId_whenAddUserToFriendsTo_thenThrowPendingFriendInvitesExceededMaximumException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendSentInvites(Arrays.asList(user, user, user, user, user, user, user, user, user, user, user));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(SentFriendInvitesExceededMaximumException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Add user to friends to with full pending invites list")
+    void givenUserIdAndFriendIdWithFullPendingInvitesList_whenAddUserToFriendsTo_thenThrowSentFriendInvitesExceededMaximumException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        friend.setFriendPendingInvites(Arrays.asList(user, user, user, user, user, user, user, user, user, user, user));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(PendingFriendInvitesExceededMaximumException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends")
+    void givenUserIdWithFriendInFriendsToAndFriendId_whenRemoveUserFromFriends_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        friend.setFriendsTo(new ArrayList<>());
+
+        user.setFriends(new ArrayList<>(Collections.singletonList(friend)));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.removeUserFromFriends(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends using same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenRemoveUserFromFriends_thenThrownTargetRecordIsTheSameAsSourceException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.removeUserFromFriends(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends using same uuid as friend")
+    void givenUserIdWithoutFriendInFriendsAndFriendId_whenRemoveUserFromFriends_thenThrownRecordNotFoundInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundInCollectionException.class, () -> userFacade.removeUserFromFriends(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenRemoveUserFromFriends_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.removeUserFromFriends(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenRemoveUserFromFriends_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.removeUserFromFriends(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends to")
+    void givenUserIdWithFriendInFriendsToAndFriendId_whenRemoveUserFromFriendsTo_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendsTo(new ArrayList<>(Collections.singletonList(friend)));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.removeUserFromFriendsTo(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends to using same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenRemoveUserFromFriendsTo_thenThrownTargetRecordIsTheSameAsSourceException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.removeUserFromFriendsTo(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends to using same uuid as friend")
+    void givenUserIdWithoutFriendInFriendsToAndFriendId_whenRemoveUserFromFriendsTo_thenThrownRecordNotFoundInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundInCollectionException.class, () -> userFacade.removeUserFromFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends to with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenRemoveUserFromFriendsTo_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.removeUserFromFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Remove user from friends to with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenRemoveUserFromFriendsTo_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.removeUserFromFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite")
+    void givenUserIdWithFriendInFriendSentInvitesAndFriendId_whenCancelUserSentInvite_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendSentInvites(new ArrayList<>(Collections.singletonList(friend)));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.cancelSentInvite(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite using same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenCancelUserSentInvite_thenThrownTargetRecordIsTheSameAsSourceException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.cancelSentInvite(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite using same uuid as friend")
+    void givenUserIdWithoutFriendInFriendsToAndFriendId_whenCancelUserSentInvite_thenThrownRecordNotFoundInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundInCollectionException.class, () -> userFacade.cancelSentInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenCancelUserSentInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.cancelSentInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenCancelUserSentInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.cancelSentInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    @Test
+    @DisplayName("Refuse user pending invite")
+    void givenUserIdWithFriendInFriendPendingInvitesAndFriendId_whenRefuseUserPendingInvite_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendPendingInvites(new ArrayList<>(Collections.singletonList(friend)));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.refuseUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite using same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenRefuseUserPendingInvite_thenThrownTargetRecordIsTheSameAsSourceException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.refuseUserPendingInvite(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite using same uuid as friend")
+    void givenUserIdWithoutFriendInFriendsToAndFriendId_whenRefuseUserPendingInvite_thenThrownRecordNotFoundInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundInCollectionException.class, () -> userFacade.refuseUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenRefuseUserPendingInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.refuseUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Cancel user sent invite with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenRefuseUserPendingInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.refuseUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    @Test
+    @DisplayName("Accept user pending invite")
+    void givenUserIdAndFriendId_whenAcceptUserPendingInvite_thenRunSuccessfully() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendPendingInvites(new ArrayList<>(Collections.singletonList(friend)));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertDoesNotThrow(() -> userFacade.acceptUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was thrown.");
+    }
+
+    @Test
+    @DisplayName("Accept user pending invite with non existing user uuid")
+    void givenNonExistingUserIdAndFriendId_whenAcceptUserPendingInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.acceptUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Accept user pending invite with same uuid as friend")
+    void givenUserIdSameAsFriendIdAndFriendId_whenAcceptUserPendingInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        // Then
+        assertThrows(TargetRecordIsTheSameAsSourceException.class, () -> userFacade.acceptUserPendingInvite(friend.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Accept user pending invite with non existing friend uuid")
+    void givenUserIdAndNonExistingFriendId_whenAcceptUserPendingInvite_thenThrownRecordNotFoundException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.empty());
+        // Then
+        assertThrows(RecordNotFoundException.class, () -> userFacade.acceptUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+    @Test
+    @DisplayName("Accept user pending invite with full friends list")
+    void givenUserIdWithFullFriendsListAndFriendId_whenAcceptUserPendingInvite_thenThrowFriendsCountExceededMaximumException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendPendingInvites(new ArrayList<>(Collections.singletonList(friend)));
+
+        List<User> friends = IntStream.range(0, 51)
+                .mapToObj(__ -> user)
+                .collect(Collectors.toList());
+
+        user.setFriends(friends);
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(FriendsCountExceededMaximumException.class, () -> userFacade.acceptUserPendingInvite(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
     }
 }
