@@ -3,7 +3,6 @@ package pl.skyterix.sadsky.user.domain;
 import lombok.RequiredArgsConstructor;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
-import pl.skyterix.sadsky.exception.RecordNotFoundException;
 import pl.skyterix.sadsky.exception.TargetRecordIsTheSameAsSourceException;
 
 import java.util.UUID;
@@ -15,14 +14,11 @@ class AddUserToFriendsToAdapter implements AddUserToFriendsToPort {
 
     @Override
     public void addUserToFriendsTo(UUID userId, UUID friendId) {
-        if (userId == friendId)
+        if (userId.equals(friendId))
             throw new TargetRecordIsTheSameAsSourceException(Errors.TARGET_RECORD_IS_THE_SAME_AS_SOURCE.getErrorMessage());
 
         User user = userRepositoryAdapter.findByUserId(userId);
         User friend = userRepositoryAdapter.findByUserId(friendId);
-
-        if (friend.getFriendPendingInvites().contains(user))
-            throw new RecordNotFoundException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(friendId));
 
         if (user.getFriendSentInvites().contains(friend))
             throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(friendId));

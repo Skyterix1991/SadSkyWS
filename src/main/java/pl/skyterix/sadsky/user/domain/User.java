@@ -57,17 +57,19 @@ public class User {
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_friends",
-            joinColumns = @JoinColumn(name = "friend_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     @SortBlacklisted
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<User> friends;
 
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_friend_pending_invites",
-            joinColumns = @JoinColumn(name = "friend_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     @SortBlacklisted
     @ToString.Exclude
@@ -119,6 +121,8 @@ public class User {
     private String encryptedPassword;
 
     @Column(name = "usergroup", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private GroupStrategy group;
 
     @Column(nullable = false)

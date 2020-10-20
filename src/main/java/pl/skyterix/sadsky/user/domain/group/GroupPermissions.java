@@ -13,8 +13,12 @@ import static pl.skyterix.sadsky.user.domain.group.SelfPermission.CANCEL_SELF_SE
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.DELETE_SELF_USER;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GENERATE_SELF_PREDICTION_RESULT;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_FULL_SELF_USER;
+import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_FRIENDS;
+import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_FRIENDS_TO;
+import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_PENDING_INVITES;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_PREDICTION;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_PREDICTIONS;
+import static pl.skyterix.sadsky.user.domain.group.SelfPermission.GET_SELF_USER_SENT_INVITES;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.REFUSE_SELF_USER_PENDING_INVITE;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.REMOVE_SELF_USER_FROM_FRIENDS;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.REMOVE_SELF_USER_FROM_FRIENDS_TO;
@@ -40,6 +44,11 @@ public class GroupPermissions {
             GET_SELF_USER_PREDICTION,
             GENERATE_SELF_PREDICTION_RESULT,
             SET_SELF_PREDICTION_DAY_EMOTIONS,
+
+            GET_SELF_USER_FRIENDS,
+            GET_SELF_USER_FRIENDS_TO,
+            GET_SELF_USER_SENT_INVITES,
+            GET_SELF_USER_PENDING_INVITES,
 
             ADD_SELF_USER_TO_FRIENDS_TO,
             REMOVE_SELF_USER_FROM_FRIENDS_TO,

@@ -78,6 +78,8 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
     public PredictionDetailsResponse getPrediction(@PathVariable UUID userId, @PathVariable UUID predictionId) {
         User currentUser = userFacade.getAuthenticatedUser();
 
+        User targetUser = jpaModelMapper.mapEntity(userFacade.getFullUser(userId), User.class);
+
         PredictionDTO predictionDTO;
 
         // Check if currentUser has permissions to get user prediction
@@ -90,6 +92,14 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
                 predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
             else
                 throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+
+            // Check if currentUser is friends to target user
+        else if (currentUser.getFriendsTo().contains(targetUser))
+
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+                predictionDTO = predictionFacade.getFullUserPrediction(userId, predictionId);
+            else
+                predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
 
         else
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));

@@ -14,7 +14,7 @@ class RefuseUserPendingInviteAdapter implements RefuseUserPendingInvitePort {
 
     @Override
     public void refuseUserPendingInvite(UUID userId, UUID friendId) {
-        if (userId == friendId)
+        if (userId.equals(friendId))
             throw new TargetRecordIsTheSameAsSourceException(Errors.TARGET_RECORD_IS_THE_SAME_AS_SOURCE.getErrorMessage());
 
         User user = userRepositoryAdapter.findByUserId(userId);

@@ -36,6 +36,8 @@ public class UserDTO {
 
     private String password;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private GroupStrategy group;
 
     @ToString.Exclude
