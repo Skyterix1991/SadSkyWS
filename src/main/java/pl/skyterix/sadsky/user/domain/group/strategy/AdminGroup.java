@@ -11,7 +11,7 @@ public class AdminGroup implements GroupStrategy {
 
     @Override
     public String getName() {
-        return "Admin";
+        return "Administrator";
     }
 
     @Override

@@ -40,6 +40,8 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
 
         User currentUser = userFacade.getAuthenticatedUser();
 
+        User targetUser = jpaModelMapper.mapEntity(userFacade.getFullUser(userId), User.class);
+
         Set<PredictionDTO> predictions;
 
         // Check if currentUser has permissions to view user predictions
@@ -53,11 +55,18 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
             else
                 throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
 
+            // Check if currentUser is friends to target user
+        else if (currentUser.getFriendsTo().contains(targetUser))
+
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+                predictions = predictionFacade.getFullUserPredictions(userId);
+            else
+                predictions = predictionFacade.getMiniUserPredictions(userId);
+
         else
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
 
         // Map to response and add hateoas
-
         return predictions.stream()
                 .map((predictionDTO) -> jpaModelMapper.mapEntity(predictionDTO, PredictionDetailsResponse.class))
                 .map(this::addPredictionRelations)
@@ -68,6 +77,8 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
     @GetMapping("/{predictionId}")
     public PredictionDetailsResponse getPrediction(@PathVariable UUID userId, @PathVariable UUID predictionId) {
         User currentUser = userFacade.getAuthenticatedUser();
+
+        User targetUser = jpaModelMapper.mapEntity(userFacade.getFullUser(userId), User.class);
 
         PredictionDTO predictionDTO;
 
@@ -81,6 +92,14 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
                 predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
             else
                 throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+
+            // Check if currentUser is friends to target user
+        else if (currentUser.getFriendsTo().contains(targetUser))
+
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+                predictionDTO = predictionFacade.getFullUserPrediction(userId, predictionId);
+            else
+                predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
 
         else
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));

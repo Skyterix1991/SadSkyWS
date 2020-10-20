@@ -2,6 +2,7 @@ package pl.skyterix.sadsky.user.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.hateoas.RepresentationModel;
 import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 
@@ -26,6 +27,8 @@ public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse
 
     private String email;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private GroupStrategy group;
 
     private LocalDateTime lastTokenRevokeDate;

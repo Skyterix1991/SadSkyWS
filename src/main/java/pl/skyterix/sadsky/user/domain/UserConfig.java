@@ -29,7 +29,13 @@ class UserConfig {
                 new DeleteUserAdapter(userRepositoryAdapter),
                 new UpdateUserAdapter(userRepositoryAdapter, bCryptPasswordEncoder),
                 new ReplaceUserAdapter(userRepositoryAdapter, bCryptPasswordEncoder),
-                new SetUserGroupAdapter(userRepositoryAdapter)
+                new SetUserGroupAdapter(userRepositoryAdapter),
+                new AcceptUserPendingInviteAdapter(userRepositoryAdapter),
+                new RefuseUserPendingInviteAdapter(userRepositoryAdapter),
+                new AddUserToFriendsToAdapter(userRepositoryAdapter),
+                new RemoveUserFromFriendsToAdapter(userRepositoryAdapter),
+                new RemoveUserFromFriendsAdapter(userRepositoryAdapter),
+                new CancelSentInviteAdapter(userRepositoryAdapter)
         );
     }
 

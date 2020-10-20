@@ -9,6 +9,8 @@ import java.text.MessageFormat;
  * Messages can contain parenthesis which can be filled using ex. Your id is {0}! and use method getErrorMessage(3);
  * Messages also can contain multiple parenthesis all can be filled using ex. Your id is {0} and your name is {1}! and use method getErrorMessage(new String[]{"3", "John"})
  * It would be nice to also indicate what value was filled for ex. [uuid={0}].
+ *
+ * Each exception that wants to use those error messages should be registered in RestExceptionControllerAdvice.
  */
 @RequiredArgsConstructor
 public enum Errors {
@@ -24,7 +26,13 @@ public enum Errors {
     PREDICTION_IS_EXPIRED("Wynik [uuid={0}] wygasł."),
     DAY_DEADLINE_EXCEPTION("Ostatni termin zmiany emocji na dzisiaj wygasł. Nie można ustawić emocji."),
     BAD_REQUEST("Przekazane wartości są niepoprawne."),
-    UNIDENTIFIED("Wystąpił nieokreślony błąd.");
+    UNIDENTIFIED("Wystąpił nieokreślony błąd."),
+    TARGET_RECORD_IS_THE_SAME_AS_SOURCE("Docelowy rekord jest ten sam to źródłowy."),
+    RECORD_ALREADY_EXISTS_IN_COLLECTION("Wynik [uuid={0}] istnieje już w kolekcji."),
+    PENDING_FRIEND_INVITES_EXCEEDED_MAXIMUM("Ilość oczekujących zaproszeń została przekroczona dla [uuid={0}]."),
+    SENT_FRIEND_INVITES_EXCEEDED_MAXIMUM("Ilość wysłanych zaproszeń została przekroczona dla [uuid={0}]."),
+    FRIENDS_COUNT_EXCEEDED_MAXIMUM("Ilość znajomych została przekroczona dla [uuid={0}]. Nie dodano znajomego."),
+    NO_RECORD_FOUND_IN_COLLECTION("Wynik [uuid={0}] nie został znaleziony w kolekcji.");
 
     private final String errorMessage;
 

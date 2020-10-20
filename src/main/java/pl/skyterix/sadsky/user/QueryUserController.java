@@ -106,6 +106,7 @@ public class QueryUserController implements QueryUserControllerPort {
 
     private UserDetailsResponse addUserRelations(UserDetailsResponse userDetailsResponse) {
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUser(userDetailsResponse.getUserId())).withSelfRel());
+        userDetailsResponse.add(linkTo(methodOn(QueryUserFriendsController.class).getUserFriends(userDetailsResponse.getUserId())).withRel("userFriends"));
         userDetailsResponse.add(linkTo(methodOn(QueryUserController.class).getUsers(null, null, null, null, null)).withRel("users"));
         userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getUserPredictions(userDetailsResponse.getUserId())).withRel("userPredictions"));
         userDetailsResponse.add(linkTo(methodOn(QueryPredictionController.class).getPrediction(userDetailsResponse.getUserId(), null)).withRel("userPrediction"));

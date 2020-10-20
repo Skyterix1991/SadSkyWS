@@ -11,7 +11,7 @@ public class UserGroup implements GroupStrategy {
 
     @Override
     public String getName() {
-        return "User";
+        return "Użytkownik";
     }
 
     @Override

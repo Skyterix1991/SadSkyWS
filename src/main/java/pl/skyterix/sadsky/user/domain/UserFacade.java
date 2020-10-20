@@ -2,6 +2,7 @@ package pl.skyterix.sadsky.user.domain;
 
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,12 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     private final UpdateUserPort updateUserAdapter;
     private final ReplaceUserPort replaceUserAdapter;
     private final SetUserGroupPort setUserGroupAdapter;
+    private final AcceptUserPendingInvitePort acceptUserPendingInviteAdapter;
+    private final RefuseUserPendingInvitePort refuseUserPendingInviteAdapter;
+    private final AddUserToFriendsToPort addUserToFriendsToAdapter;
+    private final RemoveUserFromFriendsToPort removeUserFromFriendsToAdapter;
+    private final RemoveUserFromFriendsPort removeUserFromFriendsAdapter;
+    private final CancelSentInvitePort cancelSentInviteAdapter;
 
     /**
      * Creates user based on input given in UserDTO validated before by request validators.
@@ -151,6 +158,218 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     @Override
     public void replaceUser(UUID userId, UserDTO userDTO) {
         replaceUserAdapter.replaceUser(userId, userDTO);
+    }
+
+    /**
+     * Get user mini friends.
+     * Friends are users that can view current user predictions.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserMiniFriends(UUID userId) {
+        List<UserDTO> friends = getUserFullFriends(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriends()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user mini friends to.
+     * Friends are users that current user can view predictions of.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserMiniFriendsTo(UUID userId) {
+        List<UserDTO> friends = getUserFullFriendsTo(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendsTo()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user mini pending invites.
+     * Pending invites are invites received from other users.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserMiniPendingInvites(UUID userId) {
+        List<UserDTO> friends = getUserFullPendingInvites(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user mini sent invites.
+     * Sent invites are invites sent from user to other users.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserMiniSentInvites(UUID userId) {
+        List<UserDTO> friends = getUserFullSentInvites(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user full friends.
+     * Friends are users that can view current user predictions.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserFullFriends(UUID userId) {
+        List<User> friends = userRepository.findAllUserFriends(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriends()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user full friends to.
+     * Friends to are users that current user can view predictions of.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserFullFriendsTo(UUID userId) {
+        List<User> friends = userRepository.findAllUserFriendsTo(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendsTo()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user full pending invites.
+     * Pending invites are invites received from other users.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserFullPendingInvites(UUID userId) {
+        List<User> friends = userRepository.findAllUserPendingInvites(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get user full sent invites.
+     * Sent invites are invites sent from user to other users.
+     *
+     * @param userId User UUID.
+     * @return List of users.
+     */
+    @Override
+    public List<UserDTO> getUserFullSentInvites(UUID userId) {
+        List<User> friends = userRepository.findAllUserSentInvites(userId);
+
+        return friends.stream()
+                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))  // Initialize lazy list
+                .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Add user to friends to.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void addUserToFriendsTo(UUID userId, UUID friendId) {
+        addUserToFriendsToAdapter.addUserToFriendsTo(userId, friendId);
+    }
+
+    /**
+     * Remove user from friends.
+     * Friends are users that can view current user predictions.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void removeUserFromFriends(UUID userId, UUID friendId) {
+        removeUserFromFriendsAdapter.removeUserFromFriends(userId, friendId);
+    }
+
+
+    /**
+     * Remove user from friends to.
+     * Friends to are users that current user can view predictions of.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void removeUserFromFriendsTo(UUID userId, UUID friendId) {
+        removeUserFromFriendsToAdapter.removeUserFromFriendsTo(userId, friendId);
+    }
+
+    /**
+     * Accept user pending invite.
+     * Pending invites are invites received from other users.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void acceptUserPendingInvite(UUID userId, UUID friendId) {
+        acceptUserPendingInviteAdapter.acceptUserPendingInvite(userId, friendId);
+    }
+
+    /**
+     * Refuse user pending invite.
+     * Pending invites are invites received from other users.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void refuseUserPendingInvite(UUID userId, UUID friendId) {
+        refuseUserPendingInviteAdapter.refuseUserPendingInvite(userId, friendId);
+    }
+
+    /**
+     * Cancel sent invite.
+     * Sent invites are invites sent from user to other users.
+     *
+     * @param userId   User UUID.
+     * @param friendId Friend UUID.
+     */
+    @Override
+    public void cancelSentInvite(UUID userId, UUID friendId) {
+        cancelSentInviteAdapter.cancelSentInvite(userId, friendId);
     }
 
     /**
