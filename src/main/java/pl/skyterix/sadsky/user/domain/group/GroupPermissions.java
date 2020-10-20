@@ -61,6 +61,6 @@ public class GroupPermissions {
     /**
      * Contains all available permissions.
      */
-    public static final List<Permissions> ADMIN_PERMISSIONS = Arrays.asList(Stream.of(values(), SelfPermission.values()).flatMap(Stream::of)
+    public static final List<Permissions> ADMIN_PERMISSIONS = Arrays.asList(Stream.of(Permission.values(), SelfPermission.values()).flatMap(Stream::of)
             .toArray(Permissions[]::new));
 }
