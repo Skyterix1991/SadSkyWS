@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static pl.skyterix.sadsky.user.domain.group.Permission.GET_MINI_USER;
-import static pl.skyterix.sadsky.user.domain.group.Permission.GET_MINI_USERS;
-import static pl.skyterix.sadsky.user.domain.group.Permission.values;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.ACCEPT_SELF_USER_PENDING_INVITE;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.ADD_SELF_USER_TO_FRIENDS_TO;
 import static pl.skyterix.sadsky.user.domain.group.SelfPermission.CANCEL_SELF_SENT_INVITE;
@@ -35,8 +32,6 @@ public class GroupPermissions {
     public static final List<Permissions> USER_PERMISSIONS = Arrays.asList(
             // User
             GET_FULL_SELF_USER,
-            GET_MINI_USER,
-            GET_MINI_USERS,
             DELETE_SELF_USER,
             UPDATE_SELF_USER,
             REPLACE_SELF_USER,
