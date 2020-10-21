@@ -106,15 +106,19 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
             AgeNotMeetingRequired.class,
             BlacklistedSortException.class,
             DayDeadlineException.class,
+            FriendsCountExceededMaximumException.class,
             GroupNotFoundException.class,
             GroupUnauthorizedException.class,
+            PendingFriendInvitesExceededMaximumException.class,
             PredictionIsExpiredException.class,
-            PredictionResultIsNotReadyToGenerateException.class,
             PredictionResultIsAlreadyGeneratedException.class,
+            PredictionResultIsNotReadyToGenerateException.class,
             RecordAlreadyExistsException.class,
+            RecordNotFoundException.class,
             RecordNotFoundInCollectionException.class,
             RecordAlreadyExistsInCollectionException.class,
-            RecordNotFoundException.class
+            SentFriendInvitesExceededMaximumException.class,
+            TargetRecordIsTheSameAsSourceException.class
     })
     protected ResponseEntity<Object> handleEntityNotFound(
             RestException exception) {
