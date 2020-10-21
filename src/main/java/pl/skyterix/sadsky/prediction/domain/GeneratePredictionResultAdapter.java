@@ -186,8 +186,8 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         // Is it a prediction expiration day
         if (currentTime.isEqual(prediction.getExpireDate()))
-            // Are all possible emotions filled for last deadline or is currentHour greater/equal to last deadline hour
-            return !lastDay.getEveningEmotions().isEmpty() || currentHour >= lastFillDeadline;
+            // Is currentHour greater/equal to last deadline hour
+            return currentHour >= lastFillDeadline;
 
         return false;
     }
