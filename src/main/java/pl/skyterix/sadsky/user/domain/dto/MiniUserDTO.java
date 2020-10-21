@@ -17,6 +17,10 @@ public class MiniUserDTO {
 
     private String firstName;
 
+    private String lastName;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private GroupStrategy group;
 
     private LocalDateTime createDate;
