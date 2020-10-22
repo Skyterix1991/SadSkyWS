@@ -9,19 +9,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-abstract class ApiSubError {
+abstract class AbstractApiSubError {
 }
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-class ApiValidationError extends ApiSubError {
+class AbstractApiValidationError extends AbstractApiSubError {
     private String object;
     private String field;
     private Object rejectedValue;
     private String message;
 
-    ApiValidationError(String object, String message) {
+    AbstractApiValidationError(String object, String message) {
         this.object = object;
         this.message = message;
     }

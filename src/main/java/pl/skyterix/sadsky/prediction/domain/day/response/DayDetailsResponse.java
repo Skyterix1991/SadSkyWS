@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class DayDetailsResponse extends RepresentationModel<DayDetailsResponse> implements Serializable {

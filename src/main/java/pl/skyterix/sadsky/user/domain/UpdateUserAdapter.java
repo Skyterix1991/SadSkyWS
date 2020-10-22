@@ -2,7 +2,7 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import pl.skyterix.sadsky.exception.AgeNotMeetingRequired;
+import pl.skyterix.sadsky.exception.AgeNotMeetingRequiredException;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.UUID;
+
+import static pl.skyterix.sadsky.user.domain.User.MAX_AGE;
+import static pl.skyterix.sadsky.user.domain.User.MIN_AGE;
 
 @RequiredArgsConstructor
 class UpdateUserAdapter implements UpdateUserPort {
@@ -24,8 +27,9 @@ class UpdateUserAdapter implements UpdateUserPort {
 
         User user = userRepository.findByUserId(userId);
 
-        if (userRepository.existsByEmail(userDTO.getEmail()))
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(userDTO.getEmail()));
+        }
 
         if (userDTO.getFirstName() != null) {
             user.setFirstName(userDTO.getFirstName());
@@ -39,8 +43,9 @@ class UpdateUserAdapter implements UpdateUserPort {
             int age = calculateAge(userDTO.getBirthDay());
 
             // Checks is age between 16 and 100
-            if (age < 16 || age > 100)
-                throw new AgeNotMeetingRequired(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
+            if (age < MIN_AGE || age > MAX_AGE) {
+                throw new AgeNotMeetingRequiredException(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
+            }
 
             user.setBirthDay(userDTO.getBirthDay());
         }

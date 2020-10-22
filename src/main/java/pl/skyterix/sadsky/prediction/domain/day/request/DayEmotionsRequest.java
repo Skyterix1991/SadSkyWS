@@ -8,6 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Set;
 
+/**
+ * @author Skyte
+ */
 @Data
 @NoArgsConstructor
 public class DayEmotionsRequest implements Serializable {

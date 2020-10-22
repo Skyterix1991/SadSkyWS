@@ -108,7 +108,7 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({
-            AgeNotMeetingRequired.class,
+            AgeNotMeetingRequiredException.class,
             BlacklistedSortException.class,
             DayDeadlineException.class,
             FriendsCountExceededMaximumException.class,

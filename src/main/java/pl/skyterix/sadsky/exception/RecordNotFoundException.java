@@ -3,6 +3,9 @@ package pl.skyterix.sadsky.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Skyte
+ */
 public class RecordNotFoundException extends RuntimeException implements RestException {
 
     @Getter

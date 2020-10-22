@@ -5,6 +5,9 @@ import pl.skyterix.sadsky.util.annotation.SortBlacklisted;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+/**
+ * @author Skyte
+ */
 public class SortBlacklistUtil {
 
     /**
@@ -21,7 +24,9 @@ public class SortBlacklistUtil {
         for (Field field : classToLookIn.getDeclaredFields()) {
             SortBlacklisted sortBlacklisted = field.getAnnotation(SortBlacklisted.class);
 
-            if (sortBlacklisted != null) blackListedFieldsNames.add(field.getName());
+            if (sortBlacklisted != null) {
+                blackListedFieldsNames.add(field.getName());
+            }
         }
 
         return blackListedFieldsNames;

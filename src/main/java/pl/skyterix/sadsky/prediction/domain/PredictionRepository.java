@@ -12,8 +12,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Repository
-@Transactional
+@Transactional(rollbackOn = Exception.class, dontRollbackOn = RuntimeException.class)
 public interface PredictionRepository extends JpaRepository<Prediction, Long> {
     @Query("from Prediction p where p.owner.userId = ?1 and p.predictionId = ?2")
     Optional<Prediction> findPredictionByUserIdAndPredictionId(UUID userId, UUID predictionId);

@@ -16,7 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import pl.skyterix.sadsky.exception.AgeNotMeetingRequired;
+import pl.skyterix.sadsky.exception.AgeNotMeetingRequiredException;
 import pl.skyterix.sadsky.exception.FriendsCountExceededMaximumException;
 import pl.skyterix.sadsky.exception.PendingFriendInvitesExceededMaximumException;
 import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
@@ -101,7 +101,7 @@ class UserFacadeTest {
         userDTO.setBirthDay(LocalDate.now());
         // When
         // Then
-        assertThrows(AgeNotMeetingRequired.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
+        assertThrows(AgeNotMeetingRequiredException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
 
     @Test
@@ -111,7 +111,7 @@ class UserFacadeTest {
         userDTO.setBirthDay(LocalDate.now().plusYears(100));
         // When
         // Then
-        assertThrows(AgeNotMeetingRequired.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
+        assertThrows(AgeNotMeetingRequiredException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
 
     @Test

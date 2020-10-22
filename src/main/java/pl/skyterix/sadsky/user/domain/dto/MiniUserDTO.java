@@ -8,10 +8,13 @@ import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 public class MiniUserDTO {
 
-    private long id;
+    private Long id;
 
     private UUID userId;
 

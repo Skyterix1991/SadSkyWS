@@ -36,6 +36,8 @@ import java.util.stream.IntStream;
 /**
  * Prediction class should be generated automatically for user.
  * Each predictions consists of days generated automatically from EXPIRE_DAYS number.
+ *
+ * @author Skyte
  */
 @Entity
 @Data
@@ -100,7 +102,8 @@ public class Prediction {
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        this.expireDate = currentTime.toLocalDate().plusDays(EXPIRE_DAYS - 1); // Expire in 7 days from now
+        // Expire in 7 days from now
+        this.expireDate = currentTime.toLocalDate().plusDays(EXPIRE_DAYS - 1);
         this.createDate = currentTime;
     }
 
@@ -117,8 +120,9 @@ public class Prediction {
                     int currentDayNumber = 7 - period.getDays(); // Add one at the end cause day numerations starts from 1
 
                     // Is prediction expired
-                    if (currentDayNumber > EXPIRE_DAYS)
+                    if (currentDayNumber > EXPIRE_DAYS) {
                         throw new PredictionIsExpiredException(Errors.PREDICTION_IS_EXPIRED.getErrorMessage(this.predictionId));
+                    }
 
                     return day.getDayNumber() == currentDayNumber;
                 })

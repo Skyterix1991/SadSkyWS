@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * @author Skyte
+ */
 @RequiredArgsConstructor
 public class PredictionFacade implements PredictionFacadePort {
 
@@ -30,8 +33,9 @@ public class PredictionFacade implements PredictionFacadePort {
      */
     @Override
     public Set<PredictionDTO> getFullUserPredictions(UUID userId) {
-        if (!userRepository.existsByUserId(userId))
+        if (!userRepository.existsByUserId(userId)) {
             throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId));
+        }
 
         Set<Prediction> predictions = predictionRepository.findAllByUserId(userId);
 

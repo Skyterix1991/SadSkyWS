@@ -13,10 +13,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 public class MiniUserPredictionDTO {
 
-    private long id;
+    private Long id;
 
     private UUID predictionId;
 

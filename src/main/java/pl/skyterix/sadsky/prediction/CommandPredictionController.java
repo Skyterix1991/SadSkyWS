@@ -39,8 +39,9 @@ class CommandPredictionController implements CommandPredictionControllerPort {
         // Checks if currentUser has permission to generate prediction for that user
         if (currentUser.hasPermission(userId, SelfPermission.SET_SELF_PREDICTION_DAY_EMOTIONS, Permission.SET_PREDICTION_DAY_EMOTIONS)) {
             predictionFacade.setPredictionDayEmotions(userId, predictionId, dayEmotionsRequest.getEmotions());
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -52,7 +53,8 @@ class CommandPredictionController implements CommandPredictionControllerPort {
         // Checks if currentUser has permission to generate prediction for that user
         if (currentUser.hasPermission(userId, SelfPermission.GENERATE_SELF_PREDICTION_RESULT, Permission.GENERATE_PREDICTION_RESULT)) {
             predictionFacade.generatePredictionResult(userId, predictionId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 }

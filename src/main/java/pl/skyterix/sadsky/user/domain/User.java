@@ -32,11 +32,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Entity
 @Data
 public class User {
 
+    /**
+     * Default user wake hour.
+     * Can be changed later in update request.
+     */
     public final static int DEFAULT_WAKE_HOUR = 7;
+    /**
+     * Minimum age user can register with.
+     */
+    public final static short MIN_AGE = 16;
+    /**
+     * Maximum age user can register with.
+     */
+    public final static short MAX_AGE = 100;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -161,16 +176,21 @@ public class User {
     }
 
     public boolean hasPermission(UUID targetUserId, SelfPermission selfPermission, Permission permission) {
-        if (group == null) group = new UserGroup();
+        if (group == null) {
+            group = new UserGroup();
+        }
 
-        if (userId.equals(targetUserId))
+        if (userId.equals(targetUserId)) {
             return group.hasPermission(selfPermission);
-        else
+        } else {
             return group.hasPermission(permission);
+        }
     }
 
     public boolean hasPermission(Permissions permission) {
-        if (group == null) group = new UserGroup();
+        if (group == null) {
+            group = new UserGroup();
+        }
 
         return group.hasPermission(permission);
     }

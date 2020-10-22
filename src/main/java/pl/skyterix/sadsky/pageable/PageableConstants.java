@@ -1,5 +1,8 @@
 package pl.skyterix.sadsky.pageable;
 
+/**
+ * @author Skyte
+ */
 public class PageableConstants {
 
     public final static int DEFAULT_PAGE_SIZE = 30;

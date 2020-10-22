@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Skyte
+ */
 @RestController
 @RequestMapping("/users/{userId}/predictions")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -47,24 +50,27 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
         // Check if currentUser has permissions to view user predictions
         if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_PREDICTIONS, Permission.GET_USER_PREDICTIONS))
 
-            // Determine if user can fetch full or reduced version of user
-            if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER))
+        // Determine if user can fetch full or reduced version of user
+        {
+            if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER)) {
                 predictions = predictionFacade.getFullUserPredictions(userId);
-            else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER))
+            } else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER)) {
                 predictions = predictionFacade.getMiniUserPredictions(userId);
-            else
+            } else {
                 throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+            }
+        }
 
-            // Check if currentUser is friends to target user
-        else if (currentUser.getFriendsTo().contains(targetUser))
-
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        // Check if currentUser is friends to target user
+        else if (currentUser.getFriendsTo().contains(targetUser)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 predictions = predictionFacade.getFullUserPredictions(userId);
-            else
+            } else {
                 predictions = predictionFacade.getMiniUserPredictions(userId);
-
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         return predictions.stream()
@@ -85,24 +91,27 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
         // Check if currentUser has permissions to get user prediction
         if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_PREDICTION, Permission.GET_USER_PREDICTION))
 
-            // Determine if user can fetch full or reduced version of user
-            if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER))
+        // Determine if user can fetch full or reduced version of user
+        {
+            if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER)) {
                 predictionDTO = predictionFacade.getFullUserPrediction(userId, predictionId);
-            else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER))
+            } else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER)) {
                 predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
-            else
+            } else {
                 throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+            }
+        }
 
-            // Check if currentUser is friends to target user
-        else if (currentUser.getFriendsTo().contains(targetUser))
-
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        // Check if currentUser is friends to target user
+        else if (currentUser.getFriendsTo().contains(targetUser)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 predictionDTO = predictionFacade.getFullUserPrediction(userId, predictionId);
-            else
+            } else {
                 predictionDTO = predictionFacade.getMiniUserPrediction(userId, predictionId);
-
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Add hateoas and map to response
         return addPredictionRelations(jpaModelMapper.mapEntity(predictionDTO, PredictionDetailsResponse.class));

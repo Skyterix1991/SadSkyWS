@@ -2,6 +2,8 @@ package pl.skyterix.sadsky.user.domain.group;
 
 /**
  * Permissions to use on any other user.
+ *
+ * @author Skyte
  */
 public enum Permission implements Permissions {
     // User permissions

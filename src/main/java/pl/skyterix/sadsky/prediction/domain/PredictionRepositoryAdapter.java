@@ -8,7 +8,7 @@ import javax.transaction.Transactional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(rollbackOn = Exception.class, dontRollbackOn = RuntimeException.class)
 class PredictionRepositoryAdapter implements PredictionRepositoryPort {
 
     private final PredictionRepository predictionRepository;
@@ -30,8 +30,9 @@ class PredictionRepositoryAdapter implements PredictionRepositoryPort {
 
     @Override
     public void deleteByPredictionId(UUID predictionId) {
-        if (!predictionRepository.existsByPredictionId(predictionId))
+        if (!predictionRepository.existsByPredictionId(predictionId)) {
             throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(predictionId.toString()));
+        }
 
         predictionRepository.deleteByPredictionId(predictionId);
     }

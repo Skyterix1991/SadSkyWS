@@ -53,7 +53,9 @@ class AuthorizationFilter extends BasicAuthenticationFilter {
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(SecurityConstants.TOKEN_HEADER_NAME);
-        if (token == null) return null;
+        if (token == null) {
+            return null;
+        }
 
         token = token.replace(SecurityConstants.TOKEN_HEADER_PREFIX, "").strip();
 
@@ -70,13 +72,19 @@ class AuthorizationFilter extends BasicAuthenticationFilter {
             return null;
         }
 
-        if (claims.getSubject() == null) return null;
+        if (claims.getSubject() == null) {
+            return null;
+        }
 
         Optional<User> user = applicationContext.getBean(UserRepository.class).findUserByUserId(UUID.fromString(claims.getSubject()));
-        if (user.isEmpty()) return null;
+        if (user.isEmpty()) {
+            return null;
+        }
 
         LocalDateTime lastTokenRevokeDate = LocalDateTime.parse(claims.get("lastTokenRevokeDate").toString());
-        if (!lastTokenRevokeDate.isEqual(user.get().getLastTokenRevokeDate())) return null;
+        if (!lastTokenRevokeDate.isEqual(user.get().getLastTokenRevokeDate())) {
+            return null;
+        }
 
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
 

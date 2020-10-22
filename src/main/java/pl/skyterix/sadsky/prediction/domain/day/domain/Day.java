@@ -31,12 +31,17 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * @author Skyte
+ */
 @Entity
 @Data
 @NoArgsConstructor
 public class Day {
 
-    // An integer of hours between each part of day ex. Wake hour is 7 so for 5 hours deadlines are 12 (morning), 17 (afternoon), 22 (noon)
+    /**
+     * An integer of hours between each part of day ex. Wake hour is 7 so for 5 hours deadlines are 12 (morning), 17 (afternoon), 22 (noon)
+     */
     public final static int DAY_PART_HOURS = 5;
 
     @Id
@@ -102,9 +107,15 @@ public class Day {
     public int countFilledDayParts() {
         int count = 0;
 
-        if (morningEmotions != null && !morningEmotions.isEmpty()) count++;
-        if (afternoonEmotions != null && !afternoonEmotions.isEmpty()) count++;
-        if (eveningEmotions != null && !eveningEmotions.isEmpty()) count++;
+        if (morningEmotions != null && !morningEmotions.isEmpty()) {
+            count++;
+        }
+        if (afternoonEmotions != null && !afternoonEmotions.isEmpty()) {
+            count++;
+        }
+        if (eveningEmotions != null && !eveningEmotions.isEmpty()) {
+            count++;
+        }
 
         return count;
     }
@@ -141,14 +152,16 @@ public class Day {
         // LocalDateTime list with deadlines for emotions fill
         List<LocalDateTime> deadlines = getDeadlines(prediction);
 
+        int currentDeadline = 0;
+
         // Morning emotions
-        if (isInDeadline(deadlines.get(0), deadlines.get(1))) {
+        if (isInDeadline(deadlines.get(currentDeadline++), deadlines.get(currentDeadline))) {
             this.setMorningEmotions(emotions);
             // Afternoon emotions
-        } else if (isInDeadline(deadlines.get(1), deadlines.get(2))) {
+        } else if (isInDeadline(deadlines.get(currentDeadline++), deadlines.get(currentDeadline))) {
             this.setAfternoonEmotions(emotions);
             // Evening emotions
-        } else if (isInDeadline(deadlines.get(2), deadlines.get(3))) {
+        } else if (isInDeadline(deadlines.get(currentDeadline++), deadlines.get(currentDeadline))) {
             this.setEveningEmotions(emotions);
             // Is it outside of any deadline
         } else {

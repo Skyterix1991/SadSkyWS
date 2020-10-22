@@ -11,6 +11,9 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/**
+ * @author Skyte
+ */
 @Data
 @NoArgsConstructor
 public class UserDetailsRequest implements Serializable {

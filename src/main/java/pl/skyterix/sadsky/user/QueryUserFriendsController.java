@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Skyte
+ */
 @RestController
 @RequestMapping("/users/{userId}")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -40,13 +43,15 @@ public class QueryUserFriendsController implements QueryUserFriendsControllerPor
         List<UserDTO> users;
 
         // Check if currentUser has permissions to get user mini friends
-        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_FRIENDS, Permission.GET_USER_FRIENDS))
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_FRIENDS, Permission.GET_USER_FRIENDS)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 users = userFacade.getUserFullFriends(userId);
-            else
+            } else {
                 users = userFacade.getUserMiniFriends(userId);
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         return users.stream()
@@ -63,13 +68,15 @@ public class QueryUserFriendsController implements QueryUserFriendsControllerPor
         List<UserDTO> users;
 
         // Check if currentUser has permissions to get user mini friends to
-        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_FRIENDS_TO, Permission.GET_USER_FRIENDS_TO))
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_FRIENDS_TO, Permission.GET_USER_FRIENDS_TO)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 users = userFacade.getUserFullFriendsTo(userId);
-            else
+            } else {
                 users = userFacade.getUserMiniFriendsTo(userId);
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         return users.stream()
@@ -86,13 +93,15 @@ public class QueryUserFriendsController implements QueryUserFriendsControllerPor
         List<UserDTO> users;
 
         // Check if currentUser has permissions to get user mini pending invites
-        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_PENDING_INVITES, Permission.GET_USER_PENDING_INVITES))
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_PENDING_INVITES, Permission.GET_USER_PENDING_INVITES)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 users = userFacade.getUserFullPendingInvites(userId);
-            else
+            } else {
                 users = userFacade.getUserMiniPendingInvites(userId);
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         return users.stream()
@@ -109,13 +118,15 @@ public class QueryUserFriendsController implements QueryUserFriendsControllerPor
         List<UserDTO> users;
 
         // Check if currentUser has permissions to get user mini sent invites
-        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_SENT_INVITES, Permission.GET_USER_SENT_INVITES))
-            if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_SENT_INVITES, Permission.GET_USER_SENT_INVITES)) {
+            if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
                 users = userFacade.getUserFullSentInvites(userId);
-            else
+            } else {
                 users = userFacade.getUserMiniSentInvites(userId);
-        else
+            }
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         return users.stream()

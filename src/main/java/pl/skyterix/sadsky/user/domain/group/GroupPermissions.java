@@ -26,6 +26,8 @@ import static pl.skyterix.sadsky.user.domain.group.SelfPermission.UPDATE_SELF_US
 /**
  * Permissions for each of groups.
  * You can add permissions from Permission class and SelfPermission class.
+ *
+ * @author Skyte
  */
 public class GroupPermissions {
 

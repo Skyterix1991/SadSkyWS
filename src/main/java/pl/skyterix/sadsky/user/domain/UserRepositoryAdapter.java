@@ -9,15 +9,16 @@ import javax.transaction.Transactional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(rollbackOn = Exception.class, dontRollbackOn = RuntimeException.class)
 class UserRepositoryAdapter implements UserRepositoryPort {
 
     private final UserRepository userRepository;
 
     @Override
     public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail()))
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new RecordAlreadyExistsException(Errors.RECORD_ALREADY_EXISTS.getErrorMessage(user.getEmail()));
+        }
 
         return userRepository.save(user);
     }
@@ -39,8 +40,9 @@ class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public void deleteByUserId(UUID userId) {
-        if (!userRepository.existsByUserId(userId))
+        if (!userRepository.existsByUserId(userId)) {
             throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId.toString()));
+        }
 
         userRepository.deleteByUserId(userId);
     }

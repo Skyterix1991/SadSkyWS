@@ -2,6 +2,10 @@ package pl.skyterix.sadsky.prediction.domain.day.domain;
 
 import lombok.Getter;
 
+/**
+ * @author Skyte
+ */
+
 public enum Emotion {
 
     /*

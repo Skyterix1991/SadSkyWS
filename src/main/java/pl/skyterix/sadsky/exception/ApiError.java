@@ -26,7 +26,7 @@ class ApiError {
     private LocalDateTime timestamp;
     private String message;
     private String debugMessage;
-    private List<ApiSubError> subErrors;
+    private List<AbstractApiSubError> subErrors;
 
     private ApiError() {
         timestamp = LocalDateTime.now();
@@ -51,7 +51,7 @@ class ApiError {
         this.debugMessage = ex.getLocalizedMessage();
     }
 
-    private void addSubError(ApiSubError subError) {
+    private void addSubError(AbstractApiSubError subError) {
         if (subErrors == null) {
             subErrors = new ArrayList<>();
         }
@@ -59,11 +59,11 @@ class ApiError {
     }
 
     private void addValidationError(String object, String field, Object rejectedValue, String message) {
-        addSubError(new ApiValidationError(object, field, rejectedValue, message));
+        addSubError(new AbstractApiValidationError(object, field, rejectedValue, message));
     }
 
     private void addValidationError(String object, String message) {
-        addSubError(new ApiValidationError(object, message));
+        addSubError(new AbstractApiValidationError(object, message));
     }
 
     private void addValidationError(FieldError fieldError) {

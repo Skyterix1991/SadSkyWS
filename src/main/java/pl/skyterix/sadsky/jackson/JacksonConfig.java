@@ -19,7 +19,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-// Fix for JavaScript date parse problem
+/**
+ * Fix for JavaScript date parse problem
+ */
 @Configuration
 class JacksonConfig {
 
