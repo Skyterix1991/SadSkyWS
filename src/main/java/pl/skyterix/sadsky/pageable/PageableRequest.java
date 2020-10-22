@@ -15,6 +15,9 @@ import static pl.skyterix.sadsky.pageable.PageableConstants.DEFAULT_PAGE_SIZE;
 import static pl.skyterix.sadsky.pageable.PageableConstants.DEFAULT_SORT;
 
 /**
+ * Pageable request that can be converted to Pageable.
+ * It uses constants from PageableConstants class in conversion.
+ *
  * @author Skyte
  */
 @Data

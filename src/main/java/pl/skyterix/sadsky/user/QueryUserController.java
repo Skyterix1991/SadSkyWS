@@ -55,7 +55,7 @@ public class QueryUserController implements QueryUserControllerPort {
                                                                  @RequestParam(required = false) String sort,
                                                                  @RequestParam(required = false) Integer size,
                                                                  @RequestParam(required = false) Integer page) {
-        // Build page from page informations
+        // Build page from page information
         Pageable pageable = PageableRequest.builder()
                 .order(order)
                 .sort(sort)

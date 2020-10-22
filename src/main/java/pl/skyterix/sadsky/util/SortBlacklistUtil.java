@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
+ * Util preventing fields being sorted by.
+ *
  * @author Skyte
  */
 public class SortBlacklistUtil {

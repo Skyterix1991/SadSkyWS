@@ -6,10 +6,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
+ * Application context holder.
+ *
  * @author Skyte
  */
 @Component
-public class ApplicationContextUtil implements ApplicationContextAware {
+public class ApplicationContextHolder implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
