@@ -1,3 +1,8 @@
+/**
+ * MIT License
+ * <p>
+ * Copyright (c) 2019 Bruno Leite
+ */
 package pl.skyterix.sadsky.exception;
 
 import lombok.AllArgsConstructor;
