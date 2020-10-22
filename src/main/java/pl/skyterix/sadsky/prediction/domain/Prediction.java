@@ -100,7 +100,7 @@ public class Prediction {
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        this.expireDate = currentTime.toLocalDate().plusDays(EXPIRE_DAYS); // Expire in 7 days from now
+        this.expireDate = currentTime.toLocalDate().plusDays(EXPIRE_DAYS - 1); // Expire in 7 days from now
         this.createDate = currentTime;
     }
 
@@ -114,7 +114,7 @@ public class Prediction {
                 .filter(day -> {
                     Period period = Period.between(LocalDate.now(), expireDate);
 
-                    int currentDayNumber = (7 - period.getDays()) + 1; // Add one at the end cause day numerations starts from 1
+                    int currentDayNumber = 7 - period.getDays(); // Add one at the end cause day numerations starts from 1
 
                     // Is prediction expired
                     if (currentDayNumber > EXPIRE_DAYS)
