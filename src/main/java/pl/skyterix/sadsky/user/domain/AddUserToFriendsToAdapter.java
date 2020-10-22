@@ -25,7 +25,12 @@ class AddUserToFriendsToAdapter implements AddUserToFriendsToPort {
         User user = userRepositoryAdapter.findByUserId(userId);
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
+        // Check if invite was already sent
         if (user.getFriendSentInvites().contains(friend))
+            throw new RecordAlreadyExistsInCollectionException(Errors.RECORD_ALREADY_EXISTS_IN_COLLECTION.getErrorMessage(friendId));
+
+        // Check if friend is already added to friendsTo
+        if (user.getFriendsTo().contains(friend))
             throw new RecordAlreadyExistsInCollectionException(Errors.RECORD_ALREADY_EXISTS_IN_COLLECTION.getErrorMessage(friendId));
 
         // Check if current amount of pending invites won't be higher than the limit after this request.
