@@ -30,6 +30,11 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
     private final static String DEPRESSION_DATASET_PATH = "datasets/depression.arff";
     private final static String ANXIETY_DATASET_PATH = "datasets/anxiety.arff";
 
+    /**
+     * Minimum emotion answers from all days to get result.
+     */
+    private final static int MIN_ANSWERS_REQUIRED = 7;
+
     @Override
     public void generatePredictionResult(UUID userId, UUID predictionId) {
         Prediction prediction = predictionRepositoryAdapter.findByUserIdAndPredictionId(userId, predictionId);
@@ -44,6 +49,16 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         // Check if prediction is not ready to generate results and throw exception if that's the case
         if (!isPredictionReady(user, prediction)) {
             throw new PredictionResultIsNotReadyToGenerateException(Errors.PREDICTION_RESULT_NOT_READY_TO_GENERATE.getErrorMessage());
+        }
+
+        // Check if predictions has enough answers to generate results if not cancel the prediction
+        if (!hasPredictionRequiredAmountOfAnswers(prediction)) {
+            prediction.setCanceled(true);
+
+            predictionRepositoryAdapter.updatePrediction(prediction);
+
+            generateNewPrediction(user);
+            return;
         }
 
         // Count positive and negative points from emotions for each day and sum them
@@ -63,6 +78,18 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         predictionRepositoryAdapter.updatePrediction(prediction);
 
+        generateNewPrediction(user);
+    }
+
+    private boolean hasPredictionRequiredAmountOfAnswers(Prediction prediction) {
+        long predictionAnswers = prediction.getDays().stream()
+                .mapToInt(day -> day.getTotalEmotionsAmount(day))
+                .sum();
+
+        return predictionAnswers >= MIN_ANSWERS_REQUIRED;
+    }
+
+    private void generateNewPrediction(User user) {
         // Create new prediction
         Prediction newPrediction = new Prediction();
         newPrediction.setOwner(user);
@@ -111,7 +138,7 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         long mildPredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> "MILD_ANXIETY".equals(predicate))
+                .filter("MILD_ANXIETY"::equals)
                 .count();
 
         long negativePredictions = nearestInstances.numInstances() - severePredictions - mildPredictions;

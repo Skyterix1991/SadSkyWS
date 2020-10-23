@@ -27,6 +27,8 @@ public class PredictionDTO {
     @EqualsAndHashCode.Exclude
     private List<DayDTO> days;
 
+    private Boolean canceled;
+
     private DepressionResult depressionResult;
 
     private AnxietyResult anxietyResult;

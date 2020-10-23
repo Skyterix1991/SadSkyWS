@@ -185,4 +185,12 @@ public class Day {
                     return deadlineTime.plusHours(prediction.getOwner().getWakeHour() + Day.DAY_PART_HOURS * i);
                 }).collect(Collectors.toUnmodifiableList());
     }
+
+    public int getTotalEmotionsAmount(Day day) {
+        int morningEmotionsCount = day.getMorningEmotions().size();
+        int afternoonEmotionsCount = day.getAfternoonEmotions().size();
+        int eveningEmotionsCount = day.getEveningEmotions().size();
+
+        return morningEmotionsCount + afternoonEmotionsCount + eveningEmotionsCount;
+    }
 }

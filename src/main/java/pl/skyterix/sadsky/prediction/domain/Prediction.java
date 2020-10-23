@@ -58,6 +58,9 @@ public class Prediction {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Day> days;
 
+    @Column
+    private boolean canceled;
+
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -94,6 +97,7 @@ public class Prediction {
 
         // Assign expire days in case of change of constant
         this.setExpireDays(EXPIRE_DAYS);
+        this.canceled = false;
     }
 
     @PrePersist
