@@ -17,24 +17,24 @@ import java.text.MessageFormat;
 @RequiredArgsConstructor
 public enum Errors {
 
-    NO_RECORD_FOUND("Wynik [uuid={0}] nie został znaleziony."),
-    RECORD_ALREADY_EXISTS("Wynik [uuid={0}] już istnieje."),
-    UNAUTHORIZED_GROUP("Twoja grupa [group={0}] nie posiada uprawnień aby wykonać tą akcję."),
-    GROUP_NOT_FOUND("Grupa [group={0}] nie została znaleziona."),
-    SORT_NOT_ALLOWED_ON_FIELD("Sortowanie po polu [field={0}] jest niedozwolone."),
-    AGE_NOT_MEETING_REQUIRED("Twój wiek musi być pomiędzy 16 lat a 100 lat."),
-    PREDICTION_RESULT_NOT_READY_TO_GENERATE("Resultat nie jest jeszcze możliwy do wygenerowania."),
-    PREDICTION_RESULT_IS_ALREADY_GENERATED("Rezultat jest już wygenerowany."),
-    PREDICTION_IS_EXPIRED("Wynik [uuid={0}] wygasł."),
-    DAY_DEADLINE_EXCEPTION("Ostatni termin zmiany emocji na dzisiaj wygasł. Nie można ustawić emocji."),
-    BAD_REQUEST("Przekazane wartości są niepoprawne."),
-    UNIDENTIFIED("Wystąpił nieokreślony błąd."),
-    TARGET_RECORD_IS_THE_SAME_AS_SOURCE("Docelowy rekord jest ten sam to źródłowy."),
-    RECORD_ALREADY_EXISTS_IN_COLLECTION("Wynik [uuid={0}] istnieje już w kolekcji."),
-    PENDING_FRIEND_INVITES_EXCEEDED_MAXIMUM("Ilość oczekujących zaproszeń została przekroczona dla [uuid={0}]."),
-    SENT_FRIEND_INVITES_EXCEEDED_MAXIMUM("Ilość wysłanych zaproszeń została przekroczona dla [uuid={0}]."),
-    FRIENDS_COUNT_EXCEEDED_MAXIMUM("Ilość znajomych została przekroczona dla [uuid={0}]. Nie dodano znajomego."),
-    NO_RECORD_FOUND_IN_COLLECTION("Wynik [uuid={0}] nie został znaleziony w kolekcji.");
+    NO_RECORD_FOUND("Record [uuid={0}] was not found."),
+    RECORD_ALREADY_EXISTS("Record [uuid={0}] already exists."),
+    UNAUTHORIZED_GROUP("Group [group={0}] don't have permission to do that action."),
+    GROUP_NOT_FOUND("Group [group={0}] was not found."),
+    SORT_NOT_ALLOWED_ON_FIELD("Sorting by [field={0}] is not allowed."),
+    AGE_NOT_MEETING_REQUIRED("Your age must be between 16 years old and 100 years old."),
+    PREDICTION_RESULT_NOT_READY_TO_GENERATE("Result is not ready to generate."),
+    PREDICTION_RESULT_IS_ALREADY_GENERATED("Result is already generated."),
+    PREDICTION_IS_EXPIRED("Prediction [uuid={0}] expired."),
+    DAY_DEADLINE_EXCEPTION("Day deadline reached."),
+    BAD_REQUEST("Given request data is invalid."),
+    UNIDENTIFIED("Unknown error occurred."),
+    TARGET_RECORD_IS_THE_SAME_AS_SOURCE("Target record is the same as source record."),
+    RECORD_ALREADY_EXISTS_IN_COLLECTION("Record [uuid={0}] already exists in collection."),
+    PENDING_FRIEND_INVITES_EXCEEDED_MAXIMUM("User [uuid={0}] pending invites limit was reached."),
+    SENT_FRIEND_INVITES_EXCEEDED_MAXIMUM("User [uuid={0}] sent invites limit was reached."),
+    FRIENDS_COUNT_EXCEEDED_MAXIMUM("User [uuid={0}] friends limit was reached."),
+    NO_RECORD_FOUND_IN_COLLECTION("Record [uuid={0}] was not found in collection.");
 
     private final String errorMessage;
 
