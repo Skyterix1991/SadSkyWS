@@ -9,6 +9,7 @@ import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.UserRepository;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,22 +27,22 @@ public class PredictionFacade implements PredictionFacadePort {
     private final SetPredictionDayEmotionsPort setPredictionDayEmotionsAdapter;
 
     /**
-     * Get user predictions in Set with full user details.
+     * Get user predictions in List with full user details.
      *
      * @param userId User UUID whose predictions to return.
-     * @return Result set.
+     * @return Result list.
      */
     @Override
-    public Set<PredictionDTO> getFullUserPredictions(UUID userId) {
+    public List<PredictionDTO> getFullUserPredictions(UUID userId) {
         if (!userRepository.existsByUserId(userId)) {
             throw new RecordNotFoundException(Errors.NO_RECORD_FOUND.getErrorMessage(userId));
         }
 
-        Set<Prediction> predictions = predictionRepository.findAllByUserId(userId);
+        List<Prediction> predictions = predictionRepository.findAllByUserId(userId);
 
         return predictions.stream()
                 .map((prediction) -> jpaModelMapper.mapEntity(prediction, PredictionDTO.class))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -51,13 +52,13 @@ public class PredictionFacade implements PredictionFacadePort {
      * @return Result set.
      */
     @Override
-    public Set<PredictionDTO> getMiniUserPredictions(UUID userId) {
-        Set<PredictionDTO> predictions = getFullUserPredictions(userId);
+    public List<PredictionDTO> getMiniUserPredictions(UUID userId) {
+        List<PredictionDTO> predictions = getFullUserPredictions(userId);
 
         return predictions.stream()
                 .map((prediction) -> jpaModelMapper.mapEntity(prediction, MiniUserPredictionDTO.class))
                 .map((prediction) -> jpaModelMapper.mapEntity(prediction, PredictionDTO.class))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**

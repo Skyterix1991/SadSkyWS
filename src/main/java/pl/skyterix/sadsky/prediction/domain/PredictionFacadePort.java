@@ -3,13 +3,14 @@ package pl.skyterix.sadsky.prediction.domain;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
 import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 interface PredictionFacadePort {
-    Set<PredictionDTO> getFullUserPredictions(UUID userId);
+    List<PredictionDTO> getFullUserPredictions(UUID userId);
 
-    Set<PredictionDTO> getMiniUserPredictions(UUID userId);
+    List<PredictionDTO> getMiniUserPredictions(UUID userId);
 
     PredictionDTO getFullUserPrediction(UUID userId, UUID predictionId);
 

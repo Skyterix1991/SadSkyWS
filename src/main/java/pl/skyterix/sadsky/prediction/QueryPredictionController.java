@@ -18,7 +18,7 @@ import pl.skyterix.sadsky.user.domain.group.Permission;
 import pl.skyterix.sadsky.user.domain.group.SelfPermission;
 import pl.skyterix.sadsky.util.JpaModelMapper;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,13 +39,13 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
 
     @Override
     @GetMapping
-    public Set<PredictionDetailsResponse> getUserPredictions(@PathVariable UUID userId) {
+    public List<PredictionDetailsResponse> getUserPredictions(@PathVariable UUID userId) {
 
         User currentUser = userFacade.getAuthenticatedUser();
 
         User targetUser = jpaModelMapper.mapEntity(userFacade.getFullUser(userId), User.class);
 
-        Set<PredictionDTO> predictions;
+        List<PredictionDTO> predictions;
 
         // Check if currentUser has permissions to view user predictions
         if (currentUser.hasPermission(userId, SelfPermission.GET_SELF_USER_PREDICTIONS, Permission.GET_USER_PREDICTIONS))
@@ -76,7 +76,7 @@ public class QueryPredictionController implements QueryPredictionControllerPort 
         return predictions.stream()
                 .map((predictionDTO) -> jpaModelMapper.mapEntity(predictionDTO, PredictionDetailsResponse.class))
                 .map(this::addPredictionRelations)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
