@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 public class DayDTO {
 
-    private long id;
+    private Long id;
 
     private UUID dayId;
 
@@ -20,7 +23,7 @@ public class DayDTO {
 
     private Set<Emotion> eveningEmotions;
 
-    private int dayNumber;
+    private Integer dayNumber;
 
     private LocalDateTime createDate;
 

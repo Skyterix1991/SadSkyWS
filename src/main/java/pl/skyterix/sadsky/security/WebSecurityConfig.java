@@ -31,7 +31,7 @@ import java.util.Collections;
 class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,7 +54,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcCo
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
     }
 
     private AuthenticationFilter authenticationFilter() throws Exception {

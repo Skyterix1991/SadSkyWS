@@ -31,8 +31,9 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to remove user form friends
         if (currentUser.hasPermission(userId, SelfPermission.REMOVE_SELF_USER_FROM_FRIENDS, Permission.REMOVE_USER_FROM_FRIENDS)) {
             userFacade.removeUserFromFriends(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -43,8 +44,9 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to add that user to friends to
         if (currentUser.hasPermission(userId, SelfPermission.ADD_SELF_USER_TO_FRIENDS_TO, Permission.ADD_USER_TO_FRIENDS_TO)) {
             userFacade.addUserToFriendsTo(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -55,8 +57,9 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to remove that user from friends to
         if (currentUser.hasPermission(userId, SelfPermission.REMOVE_SELF_USER_FROM_FRIENDS_TO, Permission.REMOVE_USER_FROM_FRIENDS_TO)) {
             userFacade.removeUserFromFriendsTo(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -67,8 +70,9 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to accept user in pending invites
         if (currentUser.hasPermission(userId, SelfPermission.ACCEPT_SELF_USER_PENDING_INVITE, Permission.ACCEPT_USER_PENDING_INVITE)) {
             userFacade.acceptUserPendingInvite(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -79,8 +83,9 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to refuse user in pending invites
         if (currentUser.hasPermission(userId, SelfPermission.REFUSE_SELF_USER_PENDING_INVITE, Permission.REFUSE_USER_PENDING_INVITE)) {
             userFacade.refuseUserPendingInvite(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -91,7 +96,8 @@ class CommandUserFriendsController implements CommandUserFriendsControllerPort {
         // Checks if currentUser has permission to cancel sent user invite
         if (currentUser.hasPermission(userId, SelfPermission.CANCEL_SELF_SENT_INVITE, Permission.CANCEL_SENT_INVITE)) {
             userFacade.cancelSentInvite(userId, friendId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 }

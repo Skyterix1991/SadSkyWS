@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Skyte
+ */
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -52,7 +55,7 @@ public class QueryUserController implements QueryUserControllerPort {
                                                                  @RequestParam(required = false) String sort,
                                                                  @RequestParam(required = false) Integer size,
                                                                  @RequestParam(required = false) Integer page) {
-        // Build page from page informations
+        // Build page from page information
         Pageable pageable = PageableRequest.builder()
                 .order(order)
                 .sort(sort)
@@ -61,20 +64,22 @@ public class QueryUserController implements QueryUserControllerPort {
                 .build().toPageable();
 
         // Make sure predicate is does not contain blocked fields
-        if (sortBlacklistUtil.getBlackListedFields(User.class).contains(pageable.getSort().toString().strip()))
+        if (sortBlacklistUtil.getBlackListedFields(User.class).contains(pageable.getSort().toString().strip())) {
             throw new BlacklistedSortException(Errors.SORT_NOT_ALLOWED_ON_FIELD.getErrorMessage(pageable.getSort().toString()));
+        }
 
         User currentUser = userFacade.getAuthenticatedUser();
 
         Page<UserDTO> users;
 
         // Check if currentUser has permissions to get full users or reduced users
-        if (currentUser.hasPermission(Permission.GET_FULL_USERS))
+        if (currentUser.hasPermission(Permission.GET_FULL_USERS)) {
             users = userFacade.getFullUsers(predicate, pageable);
-        else if (currentUser.hasPermission(Permission.GET_MINI_USERS))
+        } else if (currentUser.hasPermission(Permission.GET_MINI_USERS)) {
             users = userFacade.getMiniUsers(predicate, pageable);
-        else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Map to response and add hateoas
         Page<UserDetailsResponse> userDetailsResponses = users.stream()
@@ -93,12 +98,13 @@ public class QueryUserController implements QueryUserControllerPort {
         UserDTO userDTO;
 
         // Check if currentUser has permissions to get full user or reduced user
-        if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER))
+        if (currentUser.hasPermission(userId, SelfPermission.GET_FULL_SELF_USER, Permission.GET_FULL_USER)) {
             userDTO = userFacade.getFullUser(userId);
-        else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER))
+        } else if (currentUser.hasPermission(userId, SelfPermission.GET_MINI_SELF_USER, Permission.GET_MINI_USER)) {
             userDTO = userFacade.getMiniUser(userId);
-        else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
 
         // Add hateoas and map to response
         return addUserRelations(jpaModelMapper.mapEntity(userDTO, UserDetailsResponse.class));

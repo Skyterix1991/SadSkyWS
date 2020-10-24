@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a model mapper which solves common JPA situations.
+ *
+ * @author Vinícius M. Freitas
  */
 public class JpaModelMapper {
 
@@ -56,8 +58,9 @@ public class JpaModelMapper {
     }
 
     private <S, D> ModelMapper buildMapper(Class<S> sourceType, Class<D> destinationType) {
-        if (modelMapper == null)
+        if (modelMapper == null) {
             modelMapper = new ModelMapper();
+        }
 
         createJpaLazyAsNullTypeMap(sourceType, destinationType);
         return modelMapper;
@@ -65,8 +68,9 @@ public class JpaModelMapper {
 
     private <S, D> void createJpaLazyAsNullTypeMap(Class<S> sourceType, Class<D> destinationType) {
         TypeMap<S, D> typeMap = modelMapper.getTypeMap(sourceType, destinationType);
-        if (typeMap != null)
+        if (typeMap != null) {
             return;
+        }
 
         modelMapper.createTypeMap(sourceType, destinationType).setCondition(new JpaLazyAsNullCondition<S, D>(em));
     }
@@ -124,8 +128,9 @@ public class JpaModelMapper {
         Assert.notNull(entities, "source");
         Assert.notNull(destinationType, "destinationType");
 
-        if (entities.size() == 0)
+        if (entities.size() == 0) {
             return new ArrayList<>();
+        }
 
         Class<?> sourceType = entities.get(0).getClass();
         ModelMapper mapper = buildMapper(sourceType, destinationType);

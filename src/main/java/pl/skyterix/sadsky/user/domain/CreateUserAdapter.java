@@ -2,7 +2,7 @@ package pl.skyterix.sadsky.user.domain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import pl.skyterix.sadsky.exception.AgeNotMeetingRequired;
+import pl.skyterix.sadsky.exception.AgeNotMeetingRequiredException;
 import pl.skyterix.sadsky.exception.Errors;
 import pl.skyterix.sadsky.prediction.domain.dto.PredictionDTO;
 import pl.skyterix.sadsky.user.domain.dto.UserDTO;
@@ -12,6 +12,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collections;
 import java.util.UUID;
+
+import static pl.skyterix.sadsky.user.domain.User.MAX_AGE;
+import static pl.skyterix.sadsky.user.domain.User.MIN_AGE;
 
 @RequiredArgsConstructor
 class CreateUserAdapter implements CreateUserPort {
@@ -29,8 +32,9 @@ class CreateUserAdapter implements CreateUserPort {
         int age = calculateAge(userDTO.getBirthDay());
 
         // Checks is age between 16 and 100
-        if (age < 16 || age > 100)
-            throw new AgeNotMeetingRequired(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
+        if (age < MIN_AGE || age > MAX_AGE) {
+            throw new AgeNotMeetingRequiredException(Errors.AGE_NOT_MEETING_REQUIRED.getErrorMessage());
+        }
 
         // Create default prediction
         PredictionDTO predictionDTO = new PredictionDTO();

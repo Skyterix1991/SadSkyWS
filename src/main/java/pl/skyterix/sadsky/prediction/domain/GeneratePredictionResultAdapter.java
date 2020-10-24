@@ -30,6 +30,11 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
     private final static String DEPRESSION_DATASET_PATH = "datasets/depression.arff";
     private final static String ANXIETY_DATASET_PATH = "datasets/anxiety.arff";
 
+    /**
+     * Minimum emotion answers from all days to get result.
+     */
+    private final static int MIN_ANSWERS_REQUIRED = 7;
+
     @Override
     public void generatePredictionResult(UUID userId, UUID predictionId) {
         Prediction prediction = predictionRepositoryAdapter.findByUserIdAndPredictionId(userId, predictionId);
@@ -37,12 +42,24 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         User user = prediction.getOwner();
 
         // Is prediction already generated
-        if (prediction.getDepressionResult() != null)
+        if (prediction.getDepressionResult() != null) {
             throw new PredictionResultIsAlreadyGeneratedException(Errors.PREDICTION_RESULT_IS_ALREADY_GENERATED.getErrorMessage());
+        }
 
         // Check if prediction is not ready to generate results and throw exception if that's the case
-        if (!isPredictionReady(user, prediction))
+        if (!isPredictionReady(user, prediction)) {
             throw new PredictionResultIsNotReadyToGenerateException(Errors.PREDICTION_RESULT_NOT_READY_TO_GENERATE.getErrorMessage());
+        }
+
+        // Check if predictions has enough answers to generate results if not cancel the prediction
+        if (!hasPredictionRequiredAmountOfAnswers(prediction)) {
+            prediction.setCanceled(true);
+
+            predictionRepositoryAdapter.updatePrediction(prediction);
+
+            generateNewPrediction(user);
+            return;
+        }
 
         // Count positive and negative points from emotions for each day and sum them
         int depressionPointsRatio = countPointsRatio(prediction, day -> day.countPointsRatio(Emotion::getDepressionPoints));
@@ -61,6 +78,18 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         predictionRepositoryAdapter.updatePrediction(prediction);
 
+        generateNewPrediction(user);
+    }
+
+    private boolean hasPredictionRequiredAmountOfAnswers(Prediction prediction) {
+        long predictionAnswers = prediction.getDays().stream()
+                .mapToInt(day -> day.getTotalEmotionsAmount(day))
+                .sum();
+
+        return predictionAnswers >= MIN_ANSWERS_REQUIRED;
+    }
+
+    private void generateNewPrediction(User user) {
         // Create new prediction
         Prediction newPrediction = new Prediction();
         newPrediction.setOwner(user);
@@ -87,8 +116,10 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         k = (k % 2 == 0) ? k + 1 : k;
 
         Instance toPredictInstance = new DenseInstance(2);
-        toPredictInstance.setValue(0, scoreRatio); // Score ratio
-        toPredictInstance.setValue(1, totalAnswers); // Total answers
+        // Score ratio
+        toPredictInstance.setValue(0, scoreRatio);
+        // Total answers
+        toPredictInstance.setValue(1, totalAnswers);
 
         return knn.kNearestNeighbours(toPredictInstance, k);
     }
@@ -102,24 +133,26 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         long severePredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("SEVERE_ANXIETY"))
+                .filter("SEVERE_ANXIETY"::equals)
                 .count();
 
         long mildPredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("MILD_ANXIETY"))
+                .filter("MILD_ANXIETY"::equals)
                 .count();
 
         long negativePredictions = nearestInstances.numInstances() - severePredictions - mildPredictions;
 
         // If number of severe predictions is higher than mild predictions and higher than negative predictions
-        if (severePredictions > mildPredictions && severePredictions > negativePredictions)
+        if (severePredictions > mildPredictions && severePredictions > negativePredictions) {
             return AnxietyResult.SEVERE_ANXIETY;
-            // If number of mild predictions is higher than severe predictions and higher than negative predictions
-        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions)
+        }
+        // If number of mild predictions is higher than severe predictions and higher than negative predictions
+        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions) {
             return AnxietyResult.MILD_ANXIETY;
-        else
+        } else {
             return AnxietyResult.NEGATIVE;
+        }
     }
 
     private DepressionResult generateDepressionResult(int depressionScoreRatio, int totalAnswers) {
@@ -132,24 +165,26 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
 
         long severePredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("SEVERE_DEPRESSION"))
+                .filter("SEVERE_DEPRESSION"::equals)
                 .count();
 
         long mildPredictions = nearestInstances.stream()
                 .map(instance -> instance.stringValue(2))
-                .filter(predicate -> predicate.equals("MILD_DEPRESSION"))
+                .filter("MILD_DEPRESSION"::equals)
                 .count();
 
         long negativePredictions = nearestInstances.numInstances() - severePredictions - mildPredictions;
 
         // If number of severe predictions is higher than mild predictions and higher than negative predictions
-        if (severePredictions > mildPredictions && severePredictions > negativePredictions)
+        if (severePredictions > mildPredictions && severePredictions > negativePredictions) {
             return DepressionResult.SEVERE_DEPRESSION;
-            // If number of mild predictions is higher than severe predictions and higher than negative predictions
-        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions)
+        }
+        // If number of mild predictions is higher than severe predictions and higher than negative predictions
+        else if (mildPredictions > severePredictions && mildPredictions > negativePredictions) {
             return DepressionResult.MILD_DEPRESSION;
-        else
+        } else {
             return DepressionResult.NEGATIVE;
+        }
     }
 
     private int countPointsRatio(Prediction prediction, ToIntFunction<Day> toIntFunction) {
@@ -170,13 +205,15 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         LocalDate currentTime = LocalDate.now();
 
         // Is prediction expired
-        if (currentTime.isAfter(prediction.getExpireDate()))
+        if (currentTime.isAfter(prediction.getExpireDate())) {
             return true;
+        }
 
         int expireDays = prediction.getExpireDays();
 
         Day lastDay = prediction.getDays().stream()
-                .filter(day -> day.getDayNumber() == expireDays - 1) // Find last day in array
+                // Find last day in array
+                .filter(day -> day.getDayNumber() == expireDays - 1)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Missing last day of prediction."));
 
@@ -187,7 +224,9 @@ class GeneratePredictionResultAdapter implements GeneratePredictionResultPort {
         // Is it a prediction expiration day
         if (currentTime.isEqual(prediction.getExpireDate()))
             // Are all possible emotions filled for last deadline or is currentHour greater/equal to last deadline hour
+        {
             return !lastDay.getEveningEmotions().isEmpty() || currentHour >= lastFillDeadline;
+        }
 
         return false;
     }

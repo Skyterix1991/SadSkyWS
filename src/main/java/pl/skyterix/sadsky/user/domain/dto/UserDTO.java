@@ -11,10 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 public class UserDTO {
 
-    private long id;
+    private Long id;
 
     private UUID userId;
 

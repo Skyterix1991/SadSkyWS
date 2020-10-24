@@ -6,6 +6,9 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * @author Skyte
+ */
 @Converter(autoApply = true)
 public class GroupConverter implements AttributeConverter<GroupStrategy, String> {
 
@@ -19,7 +22,9 @@ public class GroupConverter implements AttributeConverter<GroupStrategy, String>
      */
     @Override
     public String convertToDatabaseColumn(GroupStrategy groupStrategy) {
-        if (groupStrategy == null) return null;
+        if (groupStrategy == null) {
+            return null;
+        }
 
         return groupStrategy.getClass().getSimpleName();
     }

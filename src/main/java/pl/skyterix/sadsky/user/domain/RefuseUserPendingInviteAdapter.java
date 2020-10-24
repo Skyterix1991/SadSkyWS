@@ -14,14 +14,16 @@ class RefuseUserPendingInviteAdapter implements RefuseUserPendingInvitePort {
 
     @Override
     public void refuseUserPendingInvite(UUID userId, UUID friendId) {
-        if (userId.equals(friendId))
+        if (userId.equals(friendId)) {
             throw new TargetRecordIsTheSameAsSourceException(Errors.TARGET_RECORD_IS_THE_SAME_AS_SOURCE.getErrorMessage());
+        }
 
         User user = userRepositoryAdapter.findByUserId(userId);
         User friend = userRepositoryAdapter.findByUserId(friendId);
 
-        if (!user.getFriendPendingInvites().contains(friend))
+        if (!user.getFriendPendingInvites().contains(friend)) {
             throw new RecordNotFoundInCollectionException(Errors.NO_RECORD_FOUND_IN_COLLECTION.getErrorMessage(friendId));
+        }
 
         // Remove invites
         user.getFriendPendingInvites().remove(friend);

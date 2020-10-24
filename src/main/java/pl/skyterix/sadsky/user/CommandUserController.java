@@ -56,8 +56,9 @@ class CommandUserController implements CommandUserControllerPort {
         // Checks if currentUser has permission to delete that user
         if (currentUser.hasPermission(userId, SelfPermission.DELETE_SELF_USER, Permission.DELETE_USER)) {
             userFacade.deleteUser(userId);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -70,8 +71,9 @@ class CommandUserController implements CommandUserControllerPort {
         // Checks if currentUser has permission to update that user
         if (currentUser.hasPermission(userId, SelfPermission.UPDATE_SELF_USER, Permission.UPDATE_USER)) {
             userFacade.updateUser(userId, userDTO);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -84,8 +86,9 @@ class CommandUserController implements CommandUserControllerPort {
         // Checks if currentUser has permission to replace that user
         if (currentUser.hasPermission(userId, SelfPermission.REPLACE_SELF_USER, Permission.REPLACE_USER)) {
             userFacade.replaceUser(userId, userDTO);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 
     @Override
@@ -96,7 +99,8 @@ class CommandUserController implements CommandUserControllerPort {
         // Checks if currentUser has permission to assign group to that user
         if (currentUser.hasPermission(Permission.ASSIGN_GROUP)) {
             userFacade.setUserGroup(userId, groupStrategy);
-        } else
+        } else {
             throw new GroupUnauthorizedException(Errors.UNAUTHORIZED_GROUP.getErrorMessage(currentUser.getGroup().getName()));
+        }
     }
 }

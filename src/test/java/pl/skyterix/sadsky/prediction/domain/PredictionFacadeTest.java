@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -69,7 +68,7 @@ class PredictionFacadeTest {
         predictionDTO = new PredictionDTO();
         predictionDTO.setPredictionId(UUID.randomUUID());
         predictionDTO.setOwner(userDTO);
-        predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS));
+        predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS - 1));
         predictionDTO.setDays(days);
 
         userDTO.setPredictions(Collections.singletonList(predictionDTO));
@@ -83,9 +82,9 @@ class PredictionFacadeTest {
         // Given
         // When
         when(userRepository.existsByUserId(any())).thenReturn(true);
-        when(predictionRepository.findAllByUserId(any())).thenReturn(Collections.singleton(prediction));
+        when(predictionRepository.findAllByUserId(any())).thenReturn(Collections.singletonList(prediction));
         // Then
-        Set<PredictionDTO> predictions = predictionFacade.getFullUserPredictions(UUID.randomUUID());
+        List<PredictionDTO> predictions = predictionFacade.getFullUserPredictions(UUID.randomUUID());
 
         assertAll(() -> {
             assertEquals(
@@ -112,9 +111,9 @@ class PredictionFacadeTest {
         // Given
         // When
         when(userRepository.existsByUserId(any())).thenReturn(true);
-        when(predictionRepository.findAllByUserId(any())).thenReturn(Collections.singleton(prediction));
+        when(predictionRepository.findAllByUserId(any())).thenReturn(Collections.singletonList(prediction));
         // Then
-        Set<PredictionDTO> predictions = predictionFacade.getMiniUserPredictions(UUID.randomUUID());
+        List<PredictionDTO> predictions = predictionFacade.getMiniUserPredictions(UUID.randomUUID());
 
         assertAll(() -> {
             assertEquals(
@@ -207,7 +206,7 @@ class PredictionFacadeTest {
     @DisplayName("Set expired prediction day emotions")
     void givenUserIdAndExpiredPredictionId_whenSetPredictionDayEmotions_thenThrowPredictionExpiredException() {
         // Given
-        prediction.setExpireDate(LocalDate.now());
+        prediction.setExpireDate(LocalDate.now().minusDays(1));
         // When
         when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
                 .thenReturn(Optional.of(prediction));

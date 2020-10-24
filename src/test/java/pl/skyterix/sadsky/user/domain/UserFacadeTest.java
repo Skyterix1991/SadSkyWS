@@ -16,7 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import pl.skyterix.sadsky.exception.AgeNotMeetingRequired;
+import pl.skyterix.sadsky.exception.AgeNotMeetingRequiredException;
 import pl.skyterix.sadsky.exception.FriendsCountExceededMaximumException;
 import pl.skyterix.sadsky.exception.PendingFriendInvitesExceededMaximumException;
 import pl.skyterix.sadsky.exception.RecordAlreadyExistsException;
@@ -71,6 +71,7 @@ class UserFacadeTest {
     @BeforeEach
     void beforeEach() {
         userDTO = new UserDTO();
+        userDTO.setId(0L);
         userDTO.setUserId(UUID.randomUUID());
         userDTO.setFirstName("Jan");
         userDTO.setLastName("Kowalski");
@@ -101,7 +102,7 @@ class UserFacadeTest {
         userDTO.setBirthDay(LocalDate.now());
         // When
         // Then
-        assertThrows(AgeNotMeetingRequired.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
+        assertThrows(AgeNotMeetingRequiredException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
 
     @Test
@@ -111,7 +112,7 @@ class UserFacadeTest {
         userDTO.setBirthDay(LocalDate.now().plusYears(100));
         // When
         // Then
-        assertThrows(AgeNotMeetingRequired.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
+        assertThrows(AgeNotMeetingRequiredException.class, () -> userFacade.createUser(userDTO), "RecordAlreadyExistsException was not thrown.");
     }
 
     @Test
@@ -277,7 +278,7 @@ class UserFacadeTest {
                     new PageImpl<>(Collections.singletonList(userDTO)).getSize(),
                     users.getSize(),
                     "Received list length is not the same as original.");
-            assertNull(users.getContent().get(0).getLastName(), "Sensitive data is exposed.");
+            assertNull(users.getContent().get(0).getEmail(), "Sensitive data is exposed.");
         });
     }
 
@@ -315,7 +316,7 @@ class UserFacadeTest {
         UserDTO miniUser = userFacade.getMiniUser(UUID.randomUUID());
 
         assertAll(() -> {
-            assertNull(miniUser.getLastName(), "Sensitive data is exposed.");
+            assertNull(miniUser.getEmail(), "Sensitive data is exposed.");
         });
     }
 
@@ -519,6 +520,22 @@ class UserFacadeTest {
         friend.setUserId(UUID.randomUUID());
 
         user.setFriendSentInvites(Collections.singletonList(friend));
+        // When
+        when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));
+        // Then
+        assertThrows(RecordAlreadyExistsInCollectionException.class, () -> userFacade.addUserToFriendsTo(user.getUserId(), friend.getUserId()), "Exception was not thrown.");
+    }
+
+
+    @Test
+    @DisplayName("Add existing user to friends to")
+    void givenUserIdAndExistingFriendId_whenAddUserToFriendsTo_thenThrowRecordAlreadyExistsInCollectionException() {
+        // Given
+        User friend = new User();
+        friend.setUserId(UUID.randomUUID());
+
+        user.setFriendsTo(Collections.singletonList(friend));
         // When
         when(userRepository.findUserByUserId(user.getUserId())).thenReturn(Optional.of(user));
         when(userRepository.findUserByUserId(friend.getUserId())).thenReturn(Optional.of(friend));

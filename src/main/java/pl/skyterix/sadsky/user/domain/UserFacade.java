@@ -31,6 +31,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * @author Skyte
+ */
 @RequiredArgsConstructor
 public class UserFacade implements UserFacadePort, CommandLineRunner {
 
@@ -172,7 +175,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<UserDTO> friends = getUserFullFriends(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriends()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriends()))
                 .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
@@ -190,7 +194,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<UserDTO> friends = getUserFullFriendsTo(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendsTo()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendsTo()))
                 .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
@@ -208,7 +213,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<UserDTO> friends = getUserFullPendingInvites(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))
                 .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
@@ -226,7 +232,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<UserDTO> friends = getUserFullSentInvites(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))
                 .map((user) -> jpaModelMapper.mapEntity(user, MiniUserDTO.class))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
@@ -244,7 +251,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<User> friends = userRepository.findAllUserFriends(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriends()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriends()))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
@@ -261,7 +269,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<User> friends = userRepository.findAllUserFriendsTo(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendsTo()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendsTo()))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
@@ -278,7 +287,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<User> friends = userRepository.findAllUserPendingInvites(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendPendingInvites()))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
@@ -295,7 +305,8 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
         List<User> friends = userRepository.findAllUserSentInvites(userId);
 
         return friends.stream()
-                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))  // Initialize lazy list
+                // Initialize lazy list
+                .peek(user -> Hibernate.initialize(user.getFriendSentInvites()))
                 .map((user) -> jpaModelMapper.mapEntity(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
@@ -403,7 +414,7 @@ public class UserFacade implements UserFacadePort, CommandLineRunner {
     @Override
     public void run(String... args) {
         Arrays.stream(environment.getActiveProfiles())
-                .filter((profile) -> profile.equals("dev"))
+                .filter("dev"::equals)
                 .findAny()
                 .ifPresent((profile) -> createTestingUsers());
     }

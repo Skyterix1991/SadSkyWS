@@ -11,6 +11,9 @@ import pl.skyterix.sadsky.user.domain.group.strategy.GroupStrategy;
 
 import java.io.IOException;
 
+/**
+ * @author Skyte
+ */
 public class GroupStrategyDeserializer extends StdDeserializer<GroupStrategy> {
 
     public GroupStrategyDeserializer() {
@@ -29,8 +32,9 @@ public class GroupStrategyDeserializer extends StdDeserializer<GroupStrategy> {
 
         GroupStrategy strategy = new GroupConverter().convertToEntityAttribute(strategyString);
 
-        if (strategy == null)
+        if (strategy == null) {
             throw new GroupNotFoundException(Errors.GROUP_NOT_FOUND.getErrorMessage(strategyString));
+        }
 
         return strategy;
     }

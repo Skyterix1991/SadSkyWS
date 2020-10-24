@@ -14,7 +14,7 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+class UserDetailsServiceImpl implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepository userRepository;
 

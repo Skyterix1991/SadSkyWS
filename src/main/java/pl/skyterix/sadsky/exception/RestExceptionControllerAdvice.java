@@ -1,3 +1,8 @@
+/**
+ * MIT License
+ * <p>
+ * Copyright (c) 2019 Bruno Leite
+ */
 package pl.skyterix.sadsky.exception;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -74,7 +79,7 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoHandlerFoundException(
             NoHandlerFoundException exception, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage(String.format("Nie znaleziono metody %s dla endpointu %s", exception.getHttpMethod(), exception.getRequestURL()));
+        apiError.setMessage(String.format("Method %s was not found for endpoint %s", exception.getHttpMethod(), exception.getRequestURL()));
         apiError.setDebugMessage(exception.getMessage());
         return responseEntity(apiError);
     }
@@ -88,7 +93,7 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException exception,
                                                                   WebRequest request) {
         if (exception.getCause() instanceof ConstraintViolationException) {
-            return responseEntity(new ApiError(HttpStatus.CONFLICT, "Błąd bazy danych", exception.getCause()));
+            return responseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", exception.getCause()));
         }
         return responseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, exception));
     }
@@ -97,24 +102,28 @@ class RestExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException exception,
                                                                       WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage(String.format("Parametr '%s' pola '%s' nie mógł być przenkonwertowany na '%s'", exception.getName(), exception.getValue(), exception.getRequiredType().getSimpleName()));
+        apiError.setMessage(String.format("Parameter '%s' of field '%s' couldn't be converted to '%s'", exception.getName(), exception.getValue(), exception.getRequiredType().getSimpleName()));
         apiError.setDebugMessage(exception.getMessage());
         return responseEntity(apiError);
     }
 
     @ExceptionHandler({
-            AgeNotMeetingRequired.class,
+            AgeNotMeetingRequiredException.class,
             BlacklistedSortException.class,
             DayDeadlineException.class,
+            FriendsCountExceededMaximumException.class,
             GroupNotFoundException.class,
             GroupUnauthorizedException.class,
+            PendingFriendInvitesExceededMaximumException.class,
             PredictionIsExpiredException.class,
-            PredictionResultIsNotReadyToGenerateException.class,
             PredictionResultIsAlreadyGeneratedException.class,
+            PredictionResultIsNotReadyToGenerateException.class,
             RecordAlreadyExistsException.class,
+            RecordNotFoundException.class,
             RecordNotFoundInCollectionException.class,
             RecordAlreadyExistsInCollectionException.class,
-            RecordNotFoundException.class
+            SentFriendInvitesExceededMaximumException.class,
+            TargetRecordIsTheSameAsSourceException.class
     })
     protected ResponseEntity<Object> handleEntityNotFound(
             RestException exception) {

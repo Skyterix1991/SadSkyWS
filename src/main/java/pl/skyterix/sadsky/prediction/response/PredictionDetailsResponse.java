@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class PredictionDetailsResponse extends RepresentationModel<PredictionDetailsResponse> implements Serializable {
@@ -28,6 +31,8 @@ public class PredictionDetailsResponse extends RepresentationModel<PredictionDet
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<DayDetailsResponse> days;
+
+    private boolean canceled;
 
     private int expireDays;
 

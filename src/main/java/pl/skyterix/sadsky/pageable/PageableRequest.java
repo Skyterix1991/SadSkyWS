@@ -14,6 +14,12 @@ import static pl.skyterix.sadsky.pageable.PageableConstants.DEFAULT_PAGE;
 import static pl.skyterix.sadsky.pageable.PageableConstants.DEFAULT_PAGE_SIZE;
 import static pl.skyterix.sadsky.pageable.PageableConstants.DEFAULT_SORT;
 
+/**
+ * Pageable request that can be converted to Pageable.
+ * It uses constants from PageableConstants class in conversion.
+ *
+ * @author Skyte
+ */
 @Data
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,10 +34,18 @@ public class PageableRequest implements Serializable {
     private Integer page;
 
     public Pageable toPageable() {
-        if (size == null) size = DEFAULT_PAGE_SIZE;
-        if (page == null) page = DEFAULT_PAGE;
-        if (sort == null) sort = DEFAULT_SORT;
-        if (size > PageableConstants.MAX_PAGE_SIZE) size = PageableConstants.MAX_PAGE_SIZE;
+        if (size == null) {
+            size = DEFAULT_PAGE_SIZE;
+        }
+        if (page == null) {
+            page = DEFAULT_PAGE;
+        }
+        if (sort == null) {
+            sort = DEFAULT_SORT;
+        }
+        if (size > PageableConstants.MAX_PAGE_SIZE) {
+            size = PageableConstants.MAX_PAGE_SIZE;
+        }
 
         Sort.Direction sortDirection = Sort.Direction.fromOptionalString(order)
                 .orElse(Sort.Direction.DESC);

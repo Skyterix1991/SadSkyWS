@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Repository
-@Transactional
+@Transactional(rollbackOn = Exception.class, dontRollbackOn = RuntimeException.class)
 public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredicateExecutor<User> {
     Optional<User> findUserByEmail(String email);
 

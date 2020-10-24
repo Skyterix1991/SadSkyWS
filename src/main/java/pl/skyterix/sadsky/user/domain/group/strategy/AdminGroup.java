@@ -5,6 +5,9 @@ import pl.skyterix.sadsky.user.domain.group.Permissions;
 
 import java.util.List;
 
+/**
+ * @author Skyte
+ */
 public class AdminGroup implements GroupStrategy {
 
     private static final List<Permissions> PERMISSIONS = GroupPermissions.ADMIN_PERMISSIONS;

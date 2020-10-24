@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * @author Skyte
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class UserDetailsResponse extends RepresentationModel<UserDetailsResponse> implements Serializable {
