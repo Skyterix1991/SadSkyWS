@@ -3,7 +3,7 @@ SadSky is a cross-platform health monitoring REST web service.
 
 Requirements:
 - MySQL/MariaDB (only for production)
-- OpenJDK 15
+- OpenJDK 15 or 11
 - Maven
 
 ## Can I add more databases?
