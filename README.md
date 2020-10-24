@@ -38,7 +38,9 @@ You need to set/add following properties:
 
 3. Run maven command: `mvn clean compile package -Dspring.profiles.active=test`.
 
-4. To run your project navigate to "Run" section in README.md 
+5. Generated file will be located in `/target` folder.
+
+6. To run your project navigate to "Run" section in README.md 
 
 ## Run Development profile
 Project consists of development profile.
