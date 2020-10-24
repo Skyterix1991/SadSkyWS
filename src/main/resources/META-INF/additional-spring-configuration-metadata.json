@@ -1,9 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "token.secret",
-      "type": "java.lang.String",
-      "description": "JWT token secret."
-    }
-  ]
-}
