@@ -71,6 +71,7 @@ class UserFacadeTest {
     @BeforeEach
     void beforeEach() {
         userDTO = new UserDTO();
+        userDTO.setId(0L);
         userDTO.setUserId(UUID.randomUUID());
         userDTO.setFirstName("Jan");
         userDTO.setLastName("Kowalski");

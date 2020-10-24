@@ -1,6 +1,7 @@
 package pl.skyterix.sadsky.prediction.domain;
 
 import lombok.RequiredArgsConstructor;
+import pl.skyterix.sadsky.prediction.domain.day.domain.Day;
 import pl.skyterix.sadsky.prediction.domain.day.domain.Emotion;
 import pl.skyterix.sadsky.user.domain.UserRepository;
 
@@ -18,7 +19,9 @@ class SetPredictionDayEmotionsAdapter implements SetPredictionDayEmotionsPort {
         Prediction prediction = predicamentRepositoryAdapter.findByUserIdAndPredictionId(userId, predictionId);
 
         // Set emotions for current part of the day or throw exception
-        prediction.getCurrentDay().setEmotions(prediction, emotions);
+        Day day = prediction.getCurrentDay();
+
+        day.setEmotions(prediction, emotions);
 
         predicamentRepositoryAdapter.updatePrediction(prediction);
     }

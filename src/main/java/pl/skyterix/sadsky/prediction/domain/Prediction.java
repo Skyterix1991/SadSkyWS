@@ -121,10 +121,10 @@ public class Prediction {
                 .filter(day -> {
                     Period period = Period.between(LocalDate.now(), expireDate);
 
-                    int currentDayNumber = 7 - period.getDays(); // Add one at the end cause day numerations starts from 1
+                    int currentDayNumber = 7 - period.getDays();
 
                     // Is prediction expired
-                    if (currentDayNumber > EXPIRE_DAYS) {
+                    if (currentDayNumber <= 0 || currentDayNumber > EXPIRE_DAYS) {
                         throw new PredictionIsExpiredException(Errors.PREDICTION_IS_EXPIRED.getErrorMessage(this.predictionId));
                     }
 

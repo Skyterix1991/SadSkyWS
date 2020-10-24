@@ -68,7 +68,7 @@ class PredictionFacadeTest {
         predictionDTO = new PredictionDTO();
         predictionDTO.setPredictionId(UUID.randomUUID());
         predictionDTO.setOwner(userDTO);
-        predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS));
+        predictionDTO.setExpireDate(LocalDate.now().plusDays(EXPIRE_DAYS - 1));
         predictionDTO.setDays(days);
 
         userDTO.setPredictions(Collections.singletonList(predictionDTO));
@@ -206,7 +206,7 @@ class PredictionFacadeTest {
     @DisplayName("Set expired prediction day emotions")
     void givenUserIdAndExpiredPredictionId_whenSetPredictionDayEmotions_thenThrowPredictionExpiredException() {
         // Given
-        prediction.setExpireDate(LocalDate.now());
+        prediction.setExpireDate(LocalDate.now().minusDays(1));
         // When
         when(predictionRepository.findPredictionByUserIdAndPredictionId(any(), any()))
                 .thenReturn(Optional.of(prediction));
