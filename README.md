@@ -50,7 +50,7 @@ Email: admin@admin.pl
 
 Password: admin
 
-To run project in development profile you can use following command: `java -jar sadsky-0.0.1.jar -Dspring.profiles.active=test`.
+To run project in development profile you can use following command: `java -jar sadsky-0.0.1.jar -Dspring.profiles.active=dev`.
 
 ## Run Production profile
 To run project in production profile you can use following command: `java -jar sadsky-0.0.1.jar -Dspring.profiles.active=prod` or just (only if compiled manually) `java -jar sadsky-0.0.1.jar`.
