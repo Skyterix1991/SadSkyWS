@@ -6,14 +6,14 @@ Requirements:
 - OpenJDK 15 or 11
 - Maven
 
-## Can I add more databases?
-Of course you can, just add its driver to pom.xml file and select its driver and dialect in application.properties.
-
 Documentation: https://skyterix1991.github.io/SadSkyWS/apidocs/
 
 REST endpoints: https://documenter.getpostman.com/view/9259933/TVYF7dkw
 
 Working example usage: https://skyterix1991.github.io/SadSkyWeb/
+
+## Can I add more databases?
+Of course you can, just add its driver to pom.xml file and select its driver and dialect in application.properties.
 
 ## Compile project
 You can compile project yourself using following instruction.
